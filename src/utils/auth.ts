@@ -591,3 +591,28 @@ export async function sendThursdayReminder(
   }
 }
 
+export async function deleteUserAccount(
+  email: string
+): Promise<{ success: boolean; message?: string }> {
+  const cleanEmail = email.trim().toLowerCase();
+  try {
+    const res = await fetch(`/api/users?email=${encodeURIComponent(cleanEmail)}`, {
+      method: 'DELETE',
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      // Also remove from local storage registry
+      const users = getUsersRegistry().filter((u) => u.email.toLowerCase() !== cleanEmail);
+      saveUsersRegistry(users);
+      return { success: true, message: data.message };
+    }
+  } catch (e) {
+    console.warn('[Auth] Delete user API offline, removing from local registry', e);
+  }
+
+  // Local fallback
+  const users = getUsersRegistry().filter((u) => u.email.toLowerCase() !== cleanEmail);
+  saveUsersRegistry(users);
+  return { success: true, message: `Account for ${cleanEmail} cleared locally!` };
+}
+

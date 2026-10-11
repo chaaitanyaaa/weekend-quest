@@ -67,18 +67,19 @@ async function verifyEmailDomainAndFormat(email) {
     return { valid: false, error: `Did you mean @${typos[domain]}? Please check your email address.` };
   }
 
-  // Gmail specific username syntax checks
+  // Gmail specific username syntax checks (supports plus aliases like user+test1@gmail.com)
   if (domain === 'gmail.com' || domain === 'googlemail.com') {
-    if (username.length < 6 || username.length > 30) {
+    const baseUsername = username.split('+')[0];
+    if (baseUsername.length < 6 || baseUsername.length > 30) {
       return {
         valid: false,
-        error: `Gmail usernames must be between 6 and 30 characters long (yours is ${username.length}).`,
+        error: `Gmail usernames must be between 6 and 30 characters long (yours is ${baseUsername.length}).`,
       };
     }
-    if (!/^[a-z0-9.]+$/.test(username)) {
+    if (!/^[a-z0-9.+]+$/.test(username)) {
       return {
         valid: false,
-        error: 'Gmail usernames can only contain letters (a-z), numbers (0-9), and periods (.).',
+        error: 'Gmail usernames can only contain letters (a-z), numbers (0-9), periods (.), and plus (+) tags.',
       };
     }
     if (username.startsWith('.') || username.endsWith('.')) {
@@ -629,6 +630,34 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && pathname === '/api/users') {
       const users = db.prepare('SELECT id, email, name, initials, color FROM users').all();
       return jsonResponse(res, 200, users);
+    }
+
+    // 4b. Clear / Delete Test User: DELETE /api/users
+    if (req.method === 'DELETE' && pathname === '/api/users') {
+      const emailParam = url.searchParams.get('email');
+      let targetEmail = emailParam;
+      if (!targetEmail) {
+        try {
+          const body = await parseBody(req);
+          targetEmail = body.email;
+        } catch {}
+      }
+
+      if (!targetEmail) {
+        return jsonResponse(res, 400, { error: 'Email is required to delete/reset an account' });
+      }
+
+      const cleanEmail = targetEmail.trim().toLowerCase();
+      db.prepare('DELETE FROM users WHERE LOWER(email) = LOWER(?)').run(cleanEmail);
+      db.prepare('DELETE FROM email_verifications WHERE LOWER(email) = LOWER(?)').run(cleanEmail);
+      db.prepare('DELETE FROM login_otps WHERE LOWER(email) = LOWER(?)').run(cleanEmail);
+      db.prepare('DELETE FROM password_resets WHERE LOWER(email) = LOWER(?)').run(cleanEmail);
+
+      console.log(`[Account Manager] Cleared user account for ${cleanEmail}`);
+      return jsonResponse(res, 200, {
+        success: true,
+        message: `Account for ${cleanEmail} has been cleared! You can now register with it afresh.`,
+      });
     }
 
     // 5. Groups list: GET /api/groups?userId=...

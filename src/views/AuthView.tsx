@@ -15,6 +15,8 @@ import {
   AlertCircle,
   KeyRound,
   Smartphone,
+  Wand2,
+  Trash2,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import {
@@ -24,6 +26,7 @@ import {
   requestPasswordReset,
   confirmPasswordReset,
   sendLoginOtp,
+  deleteUserAccount,
 } from '../utils/auth';
 import { EmailVerificationModal } from '../components/modals/EmailVerificationModal';
 import {
@@ -231,6 +234,41 @@ export function AuthView({
         onLogin(res.user);
         onToast(`Signed in as ${res.user.name}`);
       }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGenerateFreshEmail = () => {
+    const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+    const freshEmail = `tester.${Date.now().toString().slice(-4)}${randomSuffix}@gmail.com`;
+    if (mode === 'signin') {
+      setLoginEmail(freshEmail);
+      setLoginPassword('password123');
+      onToast(`Generated fresh test email: ${freshEmail}`);
+    } else {
+      setRegName(`Quest Tester ${randomSuffix}`);
+      setRegEmail(freshEmail);
+      setRegPassword('password123');
+      setRegConfirmPassword('password123');
+      onToast(`Generated new registration credentials!`);
+    }
+    setAuthError('');
+    setErrors({});
+  };
+
+  const handleClearCurrentAccount = async () => {
+    const targetEmail = (mode === 'signin' ? loginEmail : regEmail).trim();
+    if (!targetEmail || !targetEmail.includes('@')) {
+      onToast('Enter an email address above to reset it');
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await deleteUserAccount(targetEmail);
+      onToast(res.message || `Cleared ${targetEmail} from database!`);
+      setAuthError('');
+      setErrors({});
     } finally {
       setLoading(false);
     }
@@ -754,8 +792,47 @@ export function AuthView({
               </form>
             )}
 
+            {/* Developer / Testing Sandbox Tools */}
+            <div className="mt-5 pt-4 border-t border-navy/10 dark:border-white/10">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[11px] font-extrabold uppercase tracking-wider text-navy/50 dark:text-cream/50 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-coral" />
+                  Testing Sandbox Helpers
+                </span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-coral/10 text-coral font-bold">
+                  Unlimited Accounts
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <button
+                  type="button"
+                  onClick={handleGenerateFreshEmail}
+                  className="p-2.5 rounded-xl bg-cream-2/80 dark:bg-navy/80 hover:bg-cream-3 dark:hover:bg-navy text-navy dark:text-cream font-bold transition-all flex items-center justify-center gap-1.5 border border-navy/5 dark:border-white/5 active:scale-95"
+                  title="Generate a fresh unique email address"
+                >
+                  <Wand2 className="w-3.5 h-3.5 text-coral" />
+                  <span>🎲 Fresh Email</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleClearCurrentAccount}
+                  className="p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/30 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-rose-700 dark:text-rose-300 font-bold transition-all flex items-center justify-center gap-1.5 border border-rose-200/50 dark:border-rose-800/30 active:scale-95"
+                  title="Clear the current email from the database so you can re-register"
+                >
+                  <Trash2 className="w-3.5 h-3.5 text-rose-500" />
+                  <span>🗑️ Reset Email</span>
+                </button>
+              </div>
+
+              <p className="text-[10px] text-navy/40 dark:text-cream/40 text-center mt-2 leading-relaxed">
+                Tip: You can also use <strong>youremail+1@gmail.com</strong>, <strong>+2</strong>, etc. to test unlimited accounts into your real Gmail inbox!
+              </p>
+            </div>
+
             {/* Bottom Guest Action */}
-            <div className="mt-5 pt-4 text-center border-t border-navy/5 dark:border-white/5">
+            <div className="mt-4 pt-3 text-center border-t border-navy/5 dark:border-white/5">
               <button
                 type="button"
                 onClick={onGuest}
