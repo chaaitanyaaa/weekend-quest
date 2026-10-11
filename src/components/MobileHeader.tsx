@@ -1,11 +1,12 @@
 import React from 'react';
-import { Sun, Moon, Plus, Settings } from 'lucide-react';
+import { Sun, Moon, Plus, Settings, HelpCircle } from 'lucide-react';
 
 interface MobileHeaderProps {
   onCreate: () => void;
   darkMode: boolean;
   setDarkMode: (d: boolean) => void;
   onOpenSettings: () => void;
+  onOpenFaq?: () => void;
 }
 
 export function MobileHeader({
@@ -13,6 +14,7 @@ export function MobileHeader({
   darkMode,
   setDarkMode,
   onOpenSettings,
+  onOpenFaq,
 }: MobileHeaderProps) {
   return (
     <header className="lg:hidden sticky top-0 z-30 bg-cream/90 dark:bg-navy-dark/90 backdrop-blur-md border-b border-navy/10 dark:border-white/10 transition-colors">
@@ -23,7 +25,16 @@ export function MobileHeader({
           </div>
           <span className="font-display font-extrabold text-lg dark:text-cream">Weekend Quest</span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          {onOpenFaq && (
+            <button
+              onClick={onOpenFaq}
+              className="w-10 h-10 rounded-xl bg-white dark:bg-navy-card border border-navy/10 dark:border-white/10 grid place-items-center text-coral"
+              aria-label="FAQ & How it works"
+            >
+              <HelpCircle className="w-4 h-4" />
+            </button>
+          )}
           <button
             onClick={() => setDarkMode(!darkMode)}
             className="w-10 h-10 rounded-xl bg-white dark:bg-navy-card border border-navy/10 dark:border-white/10 grid place-items-center text-navy dark:text-cream"

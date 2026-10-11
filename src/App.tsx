@@ -35,6 +35,8 @@ import { CreateQuestModal } from './components/modals/CreateQuestModal';
 import { PlanQuestModal } from './components/modals/PlanQuestModal';
 import { IdeaDetailModal } from './components/modals/IdeaDetailModal';
 import { InviteModal } from './components/modals/InviteModal';
+import { FaqModal } from './components/modals/FaqModal';
+import { ScrollEnhancements } from './components/ScrollEnhancements';
 import { Toast } from './components/Toast';
 import { joinGroupByCode } from './utils/auth';
 
@@ -57,6 +59,8 @@ export function App() {
   const [darkMode, setDarkMode] = useState<boolean>(() => {
     return getStoredData<boolean>('wq_dark_mode', false);
   });
+
+  const [faqOpen, setFaqOpen] = useState<boolean>(false);
 
   useEffect(() => {
     if (darkMode) {
@@ -675,6 +679,7 @@ export function App() {
         darkMode={darkMode}
         setDarkMode={setDarkMode}
         onOpenSettings={() => setView('settings')}
+        onOpenFaq={() => setFaqOpen(true)}
       />
 
       <main className="lg:ml-64 pb-24 lg:pb-12">
@@ -685,6 +690,7 @@ export function App() {
             setNotifOpen={setNotifOpen}
             darkMode={darkMode}
             setDarkMode={setDarkMode}
+            onOpenFaq={() => setFaqOpen(true)}
           />
 
           {view === 'dashboard' && (
@@ -794,6 +800,16 @@ export function App() {
           }}
         />
       )}
+
+      {/* Floating Scroll Enhancements & Top Progress Bar */}
+      <ScrollEnhancements />
+
+      {/* How It Works & FAQ Modal */}
+      <FaqModal
+        open={faqOpen}
+        onClose={() => setFaqOpen(false)}
+        onToast={showToast}
+      />
 
       {toast && <Toast key={toast.key} message={toast.msg} />}
     </div>

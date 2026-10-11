@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Bell, Plus, Sparkles, Check, Moon, Sun } from 'lucide-react';
+import { Bell, Plus, Sparkles, Check, Moon, Sun, HelpCircle } from 'lucide-react';
 
 interface TopBarProps {
   onCreate: () => void;
@@ -7,9 +7,10 @@ interface TopBarProps {
   setNotifOpen: (v: boolean) => void;
   darkMode: boolean;
   setDarkMode: (d: boolean) => void;
+  onOpenFaq?: () => void;
 }
 
-export function TopBar({ onCreate, notifOpen, setNotifOpen, darkMode, setDarkMode }: TopBarProps) {
+export function TopBar({ onCreate, notifOpen, setNotifOpen, darkMode, setDarkMode, onOpenFaq }: TopBarProps) {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
   const notifRef = useRef<HTMLDivElement>(null);
@@ -45,9 +46,9 @@ export function TopBar({ onCreate, notifOpen, setNotifOpen, darkMode, setDarkMod
   };
 
   return (
-    <header className="flex items-center justify-between gap-3 mb-6">
+    <header className="sticky top-0 z-30 -mx-4 sm:-mx-6 lg:-mx-10 px-4 sm:px-6 lg:px-10 py-3 mb-6 flex items-center justify-between gap-3 bg-cream/85 dark:bg-navy-dark/85 backdrop-blur-md border-b border-navy/5 dark:border-white/5 transition-all">
       <div>
-        <p className="text-sm text-navy/55 dark:text-cream/55 font-medium hidden sm:block">
+        <p className="text-xs text-navy/55 dark:text-cream/55 font-medium hidden sm:block">
           {greeting}, Alex
         </p>
         <p className="font-display font-bold text-lg sm:text-2xl leading-tight dark:text-cream">
@@ -56,6 +57,17 @@ export function TopBar({ onCreate, notifOpen, setNotifOpen, darkMode, setDarkMod
       </div>
 
       <div className="flex items-center gap-2 sm:gap-3">
+        {/* Help & FAQ button */}
+        {onOpenFaq && (
+          <button
+            onClick={onOpenFaq}
+            className="w-11 h-11 rounded-2xl bg-white dark:bg-navy-card border border-navy/10 dark:border-white/10 grid place-items-center hover:bg-cream-2 dark:hover:bg-navy transition-colors shadow-soft text-navy dark:text-cream"
+            aria-label="How it works & FAQ"
+            title="How it works & FAQ"
+          >
+            <HelpCircle className="w-5 h-5 text-coral" />
+          </button>
+        )}
         {/* Dark mode desktop button */}
         <button
           onClick={() => setDarkMode(!darkMode)}
