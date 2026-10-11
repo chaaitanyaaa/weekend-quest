@@ -116,6 +116,17 @@ export function initDatabase() {
     );
   `);
 
+  // 3e. Login OTPs table (for 6-digit one-time login code)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS login_otps (
+      id TEXT PRIMARY KEY,
+      email TEXT UNIQUE NOT NULL,
+      code TEXT NOT NULL,
+      expires_at INTEGER NOT NULL,
+      attempts INTEGER DEFAULT 0
+    );
+  `);
+
   // 4. Ideas table
   db.exec(`
     CREATE TABLE IF NOT EXISTS ideas (

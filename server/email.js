@@ -17,8 +17,8 @@ let cachedTransporter = null;
 export async function getTransporter() {
   if (cachedTransporter) return cachedTransporter;
 
-  let smtpUser = (process.env.SMTP_USER || process.env.GMAIL_USER || '').trim();
-  let smtpPass = (process.env.SMTP_PASS || process.env.GMAIL_APP_PASS || '').trim();
+  let smtpUser = (process.env.SMTP_USER || process.env.GMAIL_USER || 'weekendquestverify@gmail.com').trim();
+  let smtpPass = (process.env.SMTP_PASS || process.env.GMAIL_APP_PASS || 'kses pgwf pgup dxew').trim();
 
   // If using Gmail without custom host, remove spaces from 16-character Google App Password (e.g. 'abcd efgh ijkl mnop')
   if (!process.env.SMTP_HOST && smtpPass && smtpPass.length >= 16) {
@@ -237,6 +237,16 @@ export async function sendVerificationEmail({ to, name, code }) {
     subject: `${code} is your Weekend Quest verification code`,
     text: `Welcome to Weekend Quest! Your 6-digit verification code is: ${code}. It expires in 10 minutes.`,
     html: buildVerificationHtml(name, code, to),
+  });
+}
+
+export async function sendLoginOtpEmail({ to, name, code }) {
+  console.log(`[Email Service] Sending login OTP code ${code} to ${to}...`);
+  return sendEmailGeneric({
+    to,
+    subject: `${code} is your Weekend Quest login code`,
+    text: `Welcome back! Your 6-digit one-time sign-in code for Weekend Quest is: ${code}. It expires in 10 minutes.`,
+    html: buildVerificationHtml(name || 'Adventurer', code, to),
   });
 }
 

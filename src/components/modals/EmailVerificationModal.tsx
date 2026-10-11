@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Member } from '../../types';
 import { Modal } from './Modal';
-import { verifyEmailCode, resendVerificationCode } from '../../utils/auth';
+import { verifyEmailCode, resendVerificationCode, sendLoginOtp, verifyLoginOtp } from '../../utils/auth';
 import { ShieldCheck, Mail, ArrowRight, RotateCw, Sparkles, CheckCircle2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -12,6 +12,7 @@ interface EmailVerificationModalProps {
   devCode?: string;
   emailPreviewUrl?: string | null;
   realSent?: boolean;
+  mode?: 'register' | 'login';
   onSuccess: (user: Member) => void;
   onToast: (msg: string) => void;
 }
@@ -23,6 +24,7 @@ export function EmailVerificationModal({
   devCode: initialDevCode,
   emailPreviewUrl: initialPreviewUrl,
   realSent,
+  mode = 'register',
   onSuccess,
   onToast,
 }: EmailVerificationModalProps) {
@@ -132,7 +134,10 @@ export function EmailVerificationModal({
     setLoading(true);
     setError(null);
 
-    const res = await verifyEmailCode(email, code);
+    const res = mode === 'login'
+      ? await verifyLoginOtp(email, code)
+      : await verifyEmailCode(email, code);
+
     if (!res.success || !res.user) {
       setError(res.error || 'Verification failed. Please check your code.');
       setLoading(false);
@@ -148,7 +153,7 @@ export function EmailVerificationModal({
     setLoading(false);
     onClose();
     onSuccess(res.user);
-    onToast(`Email verified! Welcome, ${res.user.name}!`);
+    onToast(mode === 'login' ? `Welcome back, ${res.user.name}!` : `Email verified! Welcome, ${res.user.name}!`);
   };
 
   const handleResend = async () => {
@@ -156,7 +161,9 @@ export function EmailVerificationModal({
     setLoading(true);
     setError(null);
 
-    const res = await resendVerificationCode(email);
+    const res = mode === 'login'
+      ? await sendLoginOtp(email)
+      : await resendVerificationCode(email);
     setLoading(false);
 
     if (res.success) {
@@ -180,8 +187,12 @@ export function EmailVerificationModal({
     <Modal
       open={open}
       onClose={onClose}
-      title="Verify your email"
-      subtitle={`Enter the 6-digit code sent to ${email}`}
+      title={mode === 'login' ? 'Sign In with OTP' : 'Verify your email'}
+      subtitle={
+        mode === 'login'
+          ? `Enter the 6-digit login code sent to ${email}`
+          : `Enter the 6-digit code sent to ${email}`
+      }
     >
       <div className="space-y-6">
         {/* Email badge */}
@@ -196,7 +207,7 @@ export function EmailVerificationModal({
             <p className="text-sm font-bold truncate dark:text-cream">{email}</p>
           </div>
           <span className="text-[11px] font-bold text-lime-dark bg-lime/30 dark:bg-lime-900/40 px-2.5 py-0.5 rounded-full shrink-0 flex items-center gap-1">
-            <ShieldCheck className="w-3.5 h-3.5" /> {realSent ? 'Sent via SMTP' : 'Domain Verified'}
+            <ShieldCheck className="w-3.5 h-3.5" /> {realSent ? 'Sent via SMTP' : 'Instant Verified'}
           </span>
         </div>
 
@@ -218,9 +229,9 @@ export function EmailVerificationModal({
         {/* 6 Digit Input Boxes */}
         <div>
           <label className="block text-xs font-bold uppercase tracking-wider text-navy/60 dark:text-cream/60 mb-2.5 text-center">
-            6-Digit Verification Code
+            6-Digit Security Code
           </label>
-          <div className="flex justify-center gap-2 sm:gap-3">
+          <div className="flex justify-center gap-1.5 sm:gap-3">
             {digits.map((digit, idx) => (
               <input
                 key={idx}
@@ -229,12 +240,14 @@ export function EmailVerificationModal({
                 }}
                 type="text"
                 inputMode="numeric"
+                pattern="[0-9]*"
+                autoComplete={idx === 0 ? 'one-time-code' : 'off'}
                 maxLength={1}
                 value={digit}
                 onChange={(e) => handleDigitChange(idx, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(idx, e)}
                 onPaste={handlePaste}
-                className={`w-11 h-14 sm:w-12 sm:h-16 text-center text-2xl font-display font-extrabold rounded-2xl border transition-all ${
+                className={`w-10 h-13 sm:w-12 sm:h-16 text-center text-xl sm:text-2xl font-display font-extrabold rounded-xl sm:rounded-2xl border transition-all ${
                   digit
                     ? 'border-coral bg-coral/5 text-coral dark:bg-coral/10 dark:text-coral-light shadow-sm'
                     : 'border-navy/15 dark:border-white/15 bg-white dark:bg-navy text-navy dark:text-cream'
@@ -249,13 +262,13 @@ export function EmailVerificationModal({
           )}
         </div>
 
-        {/* Dev Mailer Preview Card */}
+        {/* Dev Mailer / Test Helper Preview Card */}
         {devCode && (
           <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/40 text-xs">
             <div className="flex items-center justify-between gap-2">
               <span className="font-bold text-amber-800 dark:text-amber-300 flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-amber-500" />
-                Dev Mailer: Code is <strong className="text-base tracking-widest">{devCode}</strong>
+                Security Code: <strong className="text-base tracking-widest">{devCode}</strong>
               </span>
               <button
                 type="button"
@@ -282,7 +295,8 @@ export function EmailVerificationModal({
               </>
             ) : (
               <>
-                <CheckCircle2 className="w-4 h-4" /> Verify & Activate Account
+                <CheckCircle2 className="w-4 h-4" />{' '}
+                {mode === 'login' ? 'Verify & Sign In' : 'Verify & Activate Account'}
               </>
             )}
           </button>

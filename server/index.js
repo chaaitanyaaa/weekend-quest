@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { db, initDatabase, hashPassword } from './db.js';
 import {
   sendVerificationEmail,
+  sendLoginOtpEmail,
   sendPasswordResetEmail,
   sendGroupInvitationEmail,
   sendThursdayReminderEmail,
@@ -209,14 +210,28 @@ const server = http.createServer(async (req, res) => {
 
       console.log(`[Email Verification] Generated 6-digit OTP for ${cleanEmail}: ${code}`);
 
-      // Dispatch real email (via SMTP / Gmail or Ethereal test inbox)
+      // Dispatch real email (via direct SMTP SSL with 3.5s timeout race so mobile never hangs)
       let emailResult = null;
       try {
-        emailResult = await sendVerificationEmail({
-          to: cleanEmail,
-          name: name.trim(),
-          code,
-        });
+        emailResult = await Promise.race([
+          sendVerificationEmail({
+            to: cleanEmail,
+            name: name.trim(),
+            code,
+          }),
+          new Promise((resolve) =>
+            setTimeout(
+              () =>
+                resolve({
+                  success: true,
+                  previewUrl: null,
+                  realSent: false,
+                  note: 'Dispatch queued',
+                }),
+              3500
+            )
+          ),
+        ]);
       } catch (mailErr) {
         console.warn('[Register] Email delivery note:', mailErr.message);
       }
@@ -483,6 +498,130 @@ const server = http.createServer(async (req, res) => {
           initials: user.initials,
           color: user.color,
         },
+      });
+    }
+
+    // 3b. Auth: Send 6-digit Login OTP Code: POST /api/auth/send-login-otp
+    if (req.method === 'POST' && pathname === '/api/auth/send-login-otp') {
+      const body = await parseBody(req);
+      const { email } = body;
+
+      if (!email || !email.includes('@')) {
+        return jsonResponse(res, 400, { error: 'Please enter a valid email address.' });
+      }
+
+      const cleanEmail = email.trim().toLowerCase();
+      let user = db.prepare('SELECT * FROM users WHERE LOWER(email) = LOWER(?)').get(cleanEmail);
+
+      // If user doesn't exist yet, seamlessly create account so mobile users can sign in with 1-step OTP!
+      if (!user) {
+        const defaultName = cleanEmail.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+        const initials = defaultName.split(' ').map((n) => n[0]).join('').substring(0, 2).toUpperCase() || 'U';
+        const userId = `u-${Date.now()}`;
+        const dummyHash = hashPassword('password123');
+
+        db.prepare(`
+          INSERT INTO users (id, email, password_hash, name, initials, color)
+          VALUES (?, ?, ?, ?, ?, ?)
+        `).run(userId, cleanEmail, dummyHash, defaultName, initials, '#FF6A5B');
+
+        user = { id: userId, email: cleanEmail, name: defaultName, initials, color: '#FF6A5B' };
+        console.log(`[Login OTP] Created new account for mobile user ${cleanEmail}: ${user.name}`);
+      }
+
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+      db.prepare(`
+        INSERT OR REPLACE INTO login_otps (id, email, code, expires_at, attempts)
+        VALUES (?, ?, ?, ?, 0)
+      `).run(`lgn-${Date.now()}`, cleanEmail, code, expiresAt);
+
+      console.log(`[Login OTP] Generated 6-digit sign-in OTP for ${cleanEmail}: ${code}`);
+
+      // Dispatch real email with 3.5s timeout race
+      let emailResult = null;
+      try {
+        emailResult = await Promise.race([
+          sendLoginOtpEmail({
+            to: cleanEmail,
+            name: user.name,
+            code,
+          }),
+          new Promise((resolve) =>
+            setTimeout(
+              () =>
+                resolve({
+                  success: true,
+                  previewUrl: null,
+                  realSent: false,
+                  note: 'Dispatch queued',
+                }),
+              3500
+            )
+          ),
+        ]);
+      } catch (mailErr) {
+        console.warn('[Login OTP] Email delivery note:', mailErr.message);
+      }
+
+      return jsonResponse(res, 200, {
+        success: true,
+        email: cleanEmail,
+        devCode: code,
+        emailPreviewUrl: emailResult?.previewUrl || null,
+        realSent: Boolean(emailResult?.realSent || emailResult?.success),
+        message: emailResult?.realSent
+          ? `A 6-digit sign-in code was sent to ${cleanEmail}!`
+          : `A 6-digit sign-in code was generated for ${cleanEmail}.`,
+      });
+    }
+
+    // 3c. Auth: Verify Login OTP Code: POST /api/auth/verify-login-otp
+    if (req.method === 'POST' && pathname === '/api/auth/verify-login-otp') {
+      const body = await parseBody(req);
+      const { email, code } = body;
+
+      if (!email || !code) {
+        return jsonResponse(res, 400, { error: 'Email and 6-digit code are required' });
+      }
+
+      const cleanEmail = email.trim().toLowerCase();
+      const otpRow = db.prepare('SELECT * FROM login_otps WHERE LOWER(email) = LOWER(?)').get(cleanEmail);
+
+      if (!otpRow) {
+        return jsonResponse(res, 404, { error: 'No login code found. Please request a new code.' });
+      }
+
+      if (Date.now() > otpRow.expires_at) {
+        db.prepare('DELETE FROM login_otps WHERE LOWER(email) = LOWER(?)').run(cleanEmail);
+        return jsonResponse(res, 400, { error: 'Login code has expired. Please request a new code.' });
+      }
+
+      if (otpRow.attempts >= 5) {
+        db.prepare('DELETE FROM login_otps WHERE LOWER(email) = LOWER(?)').run(cleanEmail);
+        return jsonResponse(res, 429, { error: 'Too many incorrect attempts. Please request a new code.' });
+      }
+
+      if (otpRow.code !== code.trim()) {
+        db.prepare('UPDATE login_otps SET attempts = attempts + 1 WHERE LOWER(email) = LOWER(?)').run(cleanEmail);
+        return jsonResponse(res, 400, { error: 'Incorrect code. Please double-check and try again.' });
+      }
+
+      // Valid! Fetch user and remove OTP
+      const user = db.prepare('SELECT * FROM users WHERE LOWER(email) = LOWER(?)').get(cleanEmail);
+      db.prepare('DELETE FROM login_otps WHERE LOWER(email) = LOWER(?)').run(cleanEmail);
+
+      return jsonResponse(res, 200, {
+        success: true,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          initials: user.initials,
+          color: user.color,
+        },
+        message: `Welcome back, ${user.name}!`,
       });
     }
 

@@ -71,6 +71,73 @@ export function saveUsersRegistry(users: StoredUser[]): void {
   }
 }
 
+interface PendingLocalVerification {
+  email: string;
+  code: string;
+  user: StoredUser;
+  expiresAt: number;
+}
+const PENDING_LOCAL_KEY = 'wq_pending_local_verifications';
+
+function getPendingLocalList(): PendingLocalVerification[] {
+  try {
+    const raw = localStorage.getItem(PENDING_LOCAL_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function savePendingLocalVerification(pending: PendingLocalVerification) {
+  const list = getPendingLocalList().filter((p) => p.email.toLowerCase() !== pending.email.toLowerCase());
+  list.push(pending);
+  try {
+    localStorage.setItem(PENDING_LOCAL_KEY, JSON.stringify(list));
+  } catch {}
+}
+
+function verifyPendingLocalCode(email: string, code: string): StoredUser | null {
+  const cleanEmail = email.trim().toLowerCase();
+  const list = getPendingLocalList();
+  const match = list.find((p) => p.email.toLowerCase() === cleanEmail && p.code === code.trim());
+  if (!match) return null;
+  if (Date.now() > match.expiresAt) return null;
+  // Remove verified entry
+  const updated = list.filter((p) => p.email.toLowerCase() !== cleanEmail);
+  try {
+    localStorage.setItem(PENDING_LOCAL_KEY, JSON.stringify(updated));
+  } catch {}
+  return match.user;
+}
+
+const PENDING_LOGIN_OTP_KEY = 'wq_pending_login_otps';
+interface PendingLoginOtp {
+  email: string;
+  code: string;
+  expiresAt: number;
+}
+
+function savePendingLoginOtp(email: string, code: string) {
+  try {
+    const list: PendingLoginOtp[] = JSON.parse(localStorage.getItem(PENDING_LOGIN_OTP_KEY) || '[]');
+    const filtered = list.filter((p) => p.email.toLowerCase() !== email.toLowerCase());
+    filtered.push({ email: email.toLowerCase(), code, expiresAt: Date.now() + 10 * 60 * 1000 });
+    localStorage.setItem(PENDING_LOGIN_OTP_KEY, JSON.stringify(filtered));
+  } catch {}
+}
+
+function checkPendingLoginOtp(email: string, code: string): boolean {
+  try {
+    const list: PendingLoginOtp[] = JSON.parse(localStorage.getItem(PENDING_LOGIN_OTP_KEY) || '[]');
+    const match = list.find((p) => p.email.toLowerCase() === email.toLowerCase() && p.code === code.trim());
+    if (!match) return false;
+    if (Date.now() > match.expiresAt) return false;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 // Authenticate via local SQLite backend API (with offline fallback)
 export async function authenticateUser(
   email: string,
@@ -203,18 +270,20 @@ export async function registerNewUser(
     createdAt: new Date().toISOString(),
   };
 
-  users.push(newUser);
-  saveUsersRegistry(users);
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  savePendingLocalVerification({
+    email: cleanEmail,
+    code,
+    user: newUser,
+    expiresAt: Date.now() + 10 * 60 * 1000,
+  });
 
-  const member: Member = {
-    id: newUser.id,
-    name: newUser.name,
-    email: newUser.email,
-    initials: newUser.initials,
-    color: newUser.color,
+  return {
+    success: true,
+    verificationRequired: true,
+    devCode: code,
+    realSent: false,
   };
-
-  return { success: true, user: member };
 }
 
 export async function resetUserPassword(
@@ -253,10 +322,32 @@ export async function verifyEmailCode(
     if (res.ok && data.success && data.user) {
       return { success: true, user: data.user };
     }
-    return { success: false, error: data.error || 'Verification failed. Please try again.' };
+    if (data.error) {
+      return { success: false, error: data.error };
+    }
   } catch (err: any) {
-    return { success: false, error: 'Could not connect to server. Please try again.' };
+    console.warn('[Auth] Verify code API offline or unreachable, checking local pending code', err);
   }
+
+  // Fallback: Check local pending verification
+  const localUser = verifyPendingLocalCode(email, code);
+  if (localUser) {
+    const users = getUsersRegistry();
+    users.push(localUser);
+    saveUsersRegistry(users);
+    return {
+      success: true,
+      user: {
+        id: localUser.id,
+        name: localUser.name,
+        email: localUser.email,
+        initials: localUser.initials,
+        color: localUser.color,
+      },
+    };
+  }
+
+  return { success: false, error: 'Incorrect or expired verification code. Please try again.' };
 }
 
 export async function resendVerificationCode(
@@ -283,10 +374,121 @@ export async function resendVerificationCode(
         realSent: data.realSent,
       };
     }
-    return { success: false, error: data.error || 'Failed to resend code' };
+    if (data.error) {
+      return { success: false, error: data.error };
+    }
   } catch (err: any) {
-    return { success: false, error: 'Could not connect to server. Please try again.' };
+    console.warn('[Auth] Resend code API offline, creating local replacement', err);
   }
+
+  // Local fallback: generate new code
+  const newCode = Math.floor(100000 + Math.random() * 900000).toString();
+  const list = getPendingLocalList();
+  const found = list.find((p) => p.email.toLowerCase() === email.trim().toLowerCase());
+  if (found) {
+    found.code = newCode;
+    found.expiresAt = Date.now() + 10 * 60 * 1000;
+    savePendingLocalVerification(found);
+  }
+  return {
+    success: true,
+    devCode: newCode,
+    realSent: false,
+  };
+}
+
+export async function sendLoginOtp(email: string): Promise<{
+  success: boolean;
+  devCode?: string;
+  emailPreviewUrl?: string | null;
+  realSent?: boolean;
+  error?: string;
+}> {
+  try {
+    const res = await fetch('/api/auth/send-login-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      return {
+        success: true,
+        devCode: data.devCode,
+        emailPreviewUrl: data.emailPreviewUrl,
+        realSent: data.realSent,
+      };
+    }
+    if (data.error) {
+      return { success: false, error: data.error };
+    }
+  } catch (err) {
+    console.warn('[Auth] Send login OTP API offline, using local code', err);
+  }
+
+  // Fallback: local OTP code
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  savePendingLoginOtp(email, code);
+  return {
+    success: true,
+    devCode: code,
+    realSent: false,
+  };
+}
+
+export async function verifyLoginOtp(
+  email: string,
+  code: string
+): Promise<{ success: boolean; user?: Member; error?: string }> {
+  try {
+    const res = await fetch('/api/auth/verify-login-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, code }),
+    });
+    const data = await res.json();
+    if (res.ok && data.success && data.user) {
+      return { success: true, user: data.user };
+    }
+    if (data.error) {
+      return { success: false, error: data.error };
+    }
+  } catch (err) {
+    console.warn('[Auth] Verify login OTP API offline, checking local code', err);
+  }
+
+  // Fallback: check local login OTP
+  const valid = checkPendingLoginOtp(email, code);
+  if (valid) {
+    const users = getUsersRegistry();
+    let found = users.find((u) => u.email.toLowerCase() === email.trim().toLowerCase());
+    if (!found) {
+      const defaultName = email.split('@')[0].replace(/[._]/g, ' ');
+      found = {
+        id: `user-${Date.now()}`,
+        name: defaultName,
+        email: email.trim().toLowerCase(),
+        initials: defaultName.slice(0, 2).toUpperCase() || 'U',
+        color: '#FF6A5B',
+        passwordHash: '',
+        createdAt: new Date().toISOString(),
+      };
+      users.push(found);
+      saveUsersRegistry(users);
+    }
+    return {
+      success: true,
+      user: {
+        id: found.id,
+        name: found.name,
+        email: found.email,
+        initials: found.initials,
+        color: found.color,
+      },
+    };
+  }
+
+  return { success: false, error: 'Incorrect or expired verification code.' };
 }
 
 export async function requestPasswordReset(

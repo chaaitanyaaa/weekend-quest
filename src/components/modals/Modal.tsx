@@ -37,19 +37,19 @@ export function Modal({ open, onClose, title, subtitle, children, footer }: Moda
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
       role="dialog"
       aria-modal="true"
       aria-label={title}
     >
       <div
-        className="absolute inset-0 bg-navy/50 dark:bg-black/60 backdrop-blur-sm modal-overlay"
+        className="fixed inset-0 bg-navy/50 dark:bg-black/60 backdrop-blur-sm modal-overlay"
         onClick={onClose}
         aria-hidden="true"
       />
       <div
         ref={ref}
-        className="relative bg-cream dark:bg-navy-card w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl shadow-lifted modal-content max-h-[92vh] flex flex-col border border-navy/10 dark:border-white/10"
+        className="relative bg-cream dark:bg-navy-card w-full max-w-md sm:max-w-lg rounded-3xl shadow-lifted modal-content max-h-[90dvh] flex flex-col border border-navy/10 dark:border-white/10 my-auto"
       >
         <header className="flex items-start justify-between p-5 sm:p-6 border-b border-navy/10 dark:border-white/10">
           <div>

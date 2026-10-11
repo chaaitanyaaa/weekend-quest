@@ -14,6 +14,7 @@ import {
   User,
   AlertCircle,
   KeyRound,
+  Smartphone,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import {
@@ -22,6 +23,7 @@ import {
   resetUserPassword,
   requestPasswordReset,
   confirmPasswordReset,
+  sendLoginOtp,
 } from '../utils/auth';
 import { EmailVerificationModal } from '../components/modals/EmailVerificationModal';
 import {
@@ -59,6 +61,7 @@ export function AuthView({
   onToast,
 }: AuthViewProps) {
   const [mode, setMode] = useState<'signin' | 'register'>('signin');
+  const [signInMethod, setSignInMethod] = useState<'password' | 'otp'>('password');
   const [loading, setLoading] = useState(false);
 
   // Sign In form fields
@@ -87,8 +90,9 @@ export function AuthView({
   const [forgotError, setForgotError] = useState('');
   const [forgotLoading, setForgotLoading] = useState(false);
 
-  // Email verification modal
+  // Verification & Login OTP modal
   const [verifyOpen, setVerifyOpen] = useState(false);
+  const [verifyMode, setVerifyMode] = useState<'register' | 'login'>('register');
   const [verifyEmail, setVerifyEmail] = useState('');
   const [devCode, setDevCode] = useState('');
   const [emailPreviewUrl, setEmailPreviewUrl] = useState<string | null>(null);
@@ -126,6 +130,40 @@ export function AuthView({
     }
   };
 
+  const handleOtpLoginSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthError('');
+    if (!loginEmail.trim() || !loginEmail.includes('@')) {
+      setErrors({ email: 'Please enter a valid email address' });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await sendLoginOtp(loginEmail.trim());
+      if (!res.success) {
+        setAuthError(res.error || 'Failed to send one-time code.');
+        return;
+      }
+
+      setVerifyEmail(loginEmail.trim().toLowerCase());
+      setDevCode(res.devCode || '');
+      setEmailPreviewUrl(res.emailPreviewUrl || null);
+      setRealSent(Boolean(res.realSent));
+      setVerifyMode('login');
+      setVerifyOpen(true);
+      if (res.realSent) {
+        onToast(`One-time security code emailed to ${loginEmail}!`);
+      } else {
+        onToast(`One-time security code generated for ${loginEmail}`);
+      }
+    } catch (err) {
+      setAuthError('Network error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError('');
@@ -155,6 +193,7 @@ export function AuthView({
         setDevCode(res.devCode || '');
         setEmailPreviewUrl(res.emailPreviewUrl || null);
         setRealSent(Boolean(res.realSent));
+        setVerifyMode('register');
         setVerifyOpen(true);
         if (res.realSent) {
           onToast(`Verification email sent to ${regEmail}!`);
@@ -385,96 +424,194 @@ export function AuthView({
 
             {/* Mode 1: Sign In */}
             {mode === 'signin' && (
-              <form onSubmit={handleSignInSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-bold mb-1.5 dark:text-cream">Email Address</label>
-                  <div className="relative">
-                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-navy/40 dark:text-cream/40" />
-                    <input
-                      type="email"
-                      value={loginEmail}
-                      onChange={(e) => {
-                        setLoginEmail(e.target.value);
-                        setAuthError('');
-                      }}
-                      placeholder="alex@weekend.quest"
-                      className="w-full pl-10 pr-4 h-12 rounded-xl bg-cream-2 dark:bg-navy border border-transparent focus:border-coral focus:bg-white text-sm dark:text-cream focus:outline-none transition-all"
-                    />
-                  </div>
-                  {errors.email && (
-                    <p className="text-xs text-coral-dark font-semibold mt-1">{errors.email}</p>
-                  )}
+              <div className="space-y-4">
+                {/* Method selector: Password vs 6-Digit OTP */}
+                <div className="flex p-1 bg-cream-2/80 dark:bg-navy/80 rounded-xl text-xs font-bold border border-navy/5 dark:border-white/5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSignInMethod('password');
+                      setAuthError('');
+                      setErrors({});
+                    }}
+                    className={`flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+                      signInMethod === 'password'
+                        ? 'bg-white dark:bg-navy-card text-navy dark:text-cream shadow-xs font-extrabold'
+                        : 'text-navy/60 dark:text-cream/60 hover:text-navy dark:hover:text-cream'
+                    }`}
+                  >
+                    <Lock className="w-3.5 h-3.5" />
+                    <span>Password Sign In</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSignInMethod('otp');
+                      setAuthError('');
+                      setErrors({});
+                    }}
+                    className={`flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+                      signInMethod === 'otp'
+                        ? 'bg-white dark:bg-navy-card text-coral dark:text-coral shadow-xs font-extrabold'
+                        : 'text-navy/60 dark:text-cream/60 hover:text-coral'
+                    }`}
+                  >
+                    <Smartphone className="w-3.5 h-3.5 text-coral" />
+                    <span>6-Digit OTP Sign In</span>
+                  </button>
                 </div>
 
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-sm font-bold dark:text-cream">Password</label>
+                {signInMethod === 'otp' ? (
+                  /* OTP Login Form */
+                  <form onSubmit={handleOtpLoginSubmit} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-bold mb-1.5 dark:text-cream">
+                        Email Address
+                      </label>
+                      <div className="relative">
+                        <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-navy/40 dark:text-cream/40" />
+                        <input
+                          type="email"
+                          value={loginEmail}
+                          onChange={(e) => {
+                            setLoginEmail(e.target.value);
+                            setAuthError('');
+                          }}
+                          placeholder="alex@weekend.quest"
+                          className="w-full pl-10 pr-4 h-12 rounded-xl bg-cream-2 dark:bg-navy border border-transparent focus:border-coral focus:bg-white text-sm dark:text-cream focus:outline-none transition-all"
+                        />
+                      </div>
+                      {errors.email && (
+                        <p className="text-xs text-coral-dark font-semibold mt-1">{errors.email}</p>
+                      )}
+                    </div>
+
+                    <div className="p-3.5 rounded-2xl bg-coral/5 dark:bg-coral/10 border border-coral/20 text-xs text-navy/80 dark:text-cream/80 flex items-start gap-2.5">
+                      <Sparkles className="w-4 h-4 text-coral shrink-0 mt-0.5" />
+                      <div className="leading-relaxed">
+                        We'll send a <strong>6-digit security code</strong> directly to your email. Enter it on the next screen to sign in instantly without typing a password!
+                      </div>
+                    </div>
+
                     <button
-                      type="button"
-                      onClick={() => {
-                        setForgotEmail(loginEmail);
-                        setForgotOpen(true);
-                        setForgotError('');
-                      }}
-                      className="text-xs font-semibold text-coral hover:underline"
+                      type="submit"
+                      disabled={loading}
+                      className="w-full h-12 rounded-2xl bg-coral text-cream font-bold text-sm shadow-coral hover:bg-coral-dark active:scale-95 transition-all flex items-center justify-center gap-2 mt-2 disabled:opacity-60"
                     >
-                      Forgot password?
+                      {loading ? (
+                        <span className="inline-block animate-spin mr-2">⏳</span>
+                      ) : (
+                        <>
+                          <Smartphone className="w-4 h-4" />
+                          <span>Send 6-Digit OTP Code</span>
+                          <ArrowRight className="w-4 h-4" />
+                        </>
+                      )}
                     </button>
-                  </div>
-                  <div className="relative">
-                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-navy/40 dark:text-cream/40" />
-                    <input
-                      type={showLoginPassword ? 'text' : 'password'}
-                      value={loginPassword}
-                      onChange={(e) => {
-                        setLoginPassword(e.target.value);
-                        setAuthError('');
-                      }}
-                      placeholder="••••••••"
-                      className="w-full pl-10 pr-11 h-12 rounded-xl bg-cream-2 dark:bg-navy border border-transparent focus:border-coral focus:bg-white text-sm dark:text-cream focus:outline-none transition-all"
-                    />
+                  </form>
+                ) : (
+                  /* Password Login Form */
+                  <form onSubmit={handleSignInSubmit} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-bold mb-1.5 dark:text-cream">Email Address</label>
+                      <div className="relative">
+                        <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-navy/40 dark:text-cream/40" />
+                        <input
+                          type="email"
+                          value={loginEmail}
+                          onChange={(e) => {
+                            setLoginEmail(e.target.value);
+                            setAuthError('');
+                          }}
+                          placeholder="alex@weekend.quest"
+                          className="w-full pl-10 pr-4 h-12 rounded-xl bg-cream-2 dark:bg-navy border border-transparent focus:border-coral focus:bg-white text-sm dark:text-cream focus:outline-none transition-all"
+                        />
+                      </div>
+                      {errors.email && (
+                        <p className="text-xs text-coral-dark font-semibold mt-1">{errors.email}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="text-sm font-bold dark:text-cream">Password</label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setForgotEmail(loginEmail);
+                            setForgotOpen(true);
+                            setForgotError('');
+                          }}
+                          className="text-xs font-semibold text-coral hover:underline"
+                        >
+                          Forgot password?
+                        </button>
+                      </div>
+                      <div className="relative">
+                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-navy/40 dark:text-cream/40" />
+                        <input
+                          type={showLoginPassword ? 'text' : 'password'}
+                          value={loginPassword}
+                          onChange={(e) => {
+                            setLoginPassword(e.target.value);
+                            setAuthError('');
+                          }}
+                          placeholder="••••••••"
+                          className="w-full pl-10 pr-11 h-12 rounded-xl bg-cream-2 dark:bg-navy border border-transparent focus:border-coral focus:bg-white text-sm dark:text-cream focus:outline-none transition-all"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowLoginPassword(!showLoginPassword)}
+                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-navy/40 dark:text-cream/40 hover:text-navy"
+                        >
+                          {showLoginPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                      {errors.password && (
+                        <p className="text-xs text-coral-dark font-semibold mt-1">{errors.password}</p>
+                      )}
+                      <div className="flex items-center justify-between text-[11px] text-navy/50 dark:text-cream/50 mt-1">
+                        <span>
+                          Default demo: <code className="font-mono font-bold text-coral">password123</code>
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setSignInMethod('otp')}
+                          className="text-coral hover:underline font-bold"
+                        >
+                          Use OTP code instead →
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-1">
+                      <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-navy/70 dark:text-cream/70">
+                        <input
+                          type="checkbox"
+                          checked={rememberMe}
+                          onChange={(e) => setRememberMe(e.target.checked)}
+                          className="w-4 h-4 accent-coral rounded"
+                        />
+                        Remember me on this device
+                      </label>
+                    </div>
+
                     <button
-                      type="button"
-                      onClick={() => setShowLoginPassword(!showLoginPassword)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-navy/40 dark:text-cream/40 hover:text-navy"
+                      type="submit"
+                      disabled={loading}
+                      className="w-full h-12 rounded-2xl bg-coral text-cream font-bold text-sm shadow-coral hover:bg-coral-dark active:scale-95 transition-all flex items-center justify-center gap-2 mt-2 disabled:opacity-60"
                     >
-                      {showLoginPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {loading ? (
+                        <span className="inline-block animate-spin mr-2">⏳</span>
+                      ) : (
+                        <>
+                          <span>Sign In with Password</span>
+                          <ArrowRight className="w-4 h-4" />
+                        </>
+                      )}
                     </button>
-                  </div>
-                  {errors.password && (
-                    <p className="text-xs text-coral-dark font-semibold mt-1">{errors.password}</p>
-                  )}
-                  <p className="text-[11px] text-navy/50 dark:text-cream/50 mt-1">
-                    Default demo password: <code className="font-mono font-bold text-coral">password123</code>
-                  </p>
-                </div>
-
-                <div className="flex items-center justify-between pt-1">
-                  <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-navy/70 dark:text-cream/70">
-                    <input
-                      type="checkbox"
-                      checked={rememberMe}
-                      onChange={(e) => setRememberMe(e.target.checked)}
-                      className="w-4 h-4 accent-coral rounded"
-                    />
-                    Remember me on this device
-                  </label>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full h-12 rounded-2xl bg-coral text-cream font-bold text-sm shadow-coral hover:bg-coral-dark active:scale-95 transition-all flex items-center justify-center gap-2 mt-2 disabled:opacity-60"
-                >
-                  {loading ? (
-                    <span className="inline-block animate-spin mr-2">⏳</span>
-                  ) : (
-                    <>
-                      <span>Sign In with Verification</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </>
-                  )}
-                </button>
+                  </form>
+                )}
 
                 {/* 1-Click Quick Demo Accounts with pre-verified credentials */}
                 <div className="pt-4 border-t border-navy/10 dark:border-white/10 space-y-2">
@@ -500,7 +637,7 @@ export function AuthView({
                     </button>
                   </div>
                 </div>
-              </form>
+              </div>
             )}
 
             {/* Mode 2: Register */}
@@ -633,12 +770,12 @@ export function AuthView({
 
       {/* Forgot Password Reset Modal */}
       {forgotOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
           <div
-            className="absolute inset-0 bg-navy/50 backdrop-blur-sm"
+            className="fixed inset-0 bg-navy/50 backdrop-blur-sm"
             onClick={() => setForgotOpen(false)}
           />
-          <div className="relative bg-white dark:bg-navy-card w-full max-w-md rounded-3xl shadow-lifted p-6 border border-navy/10 dark:border-white/10 z-10 slide-in-right">
+          <div className="relative bg-white dark:bg-navy-card w-full max-w-md rounded-3xl shadow-lifted p-6 border border-navy/10 dark:border-white/10 z-10 slide-in-right my-auto">
             <div className="flex items-center gap-2.5 mb-2">
               <div className="w-9 h-9 rounded-xl bg-coral/10 text-coral grid place-items-center">
                 <KeyRound className="w-5 h-5" />
@@ -782,7 +919,7 @@ export function AuthView({
         </div>
       )}
 
-      {/* 6-Digit Email Verification Modal */}
+      {/* 6-Digit Email Verification / Login OTP Modal */}
       <EmailVerificationModal
         open={verifyOpen}
         onClose={() => setVerifyOpen(false)}
@@ -790,8 +927,13 @@ export function AuthView({
         devCode={devCode}
         emailPreviewUrl={emailPreviewUrl}
         realSent={realSent}
+        mode={verifyMode}
         onSuccess={(user) => {
-          onRegister(user);
+          if (verifyMode === 'login') {
+            onLogin(user);
+          } else {
+            onRegister(user);
+          }
         }}
         onToast={onToast}
       />
