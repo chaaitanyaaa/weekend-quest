@@ -332,11 +332,14 @@ const server = http.createServer(async (req, res) => {
       // Dispatch real email on resend
       let emailResult = null;
       try {
-        emailResult = await sendVerificationEmail({
-          to: cleanEmail,
-          name: pending.name,
-          code: newCode,
-        });
+        emailResult = await Promise.race([
+          sendVerificationEmail({
+            to: cleanEmail,
+            name: pending.name,
+            code: newCode,
+          }),
+          new Promise((resolve) => setTimeout(() => resolve({ timeout: true, realSent: false }), 3500)),
+        ]);
       } catch (mailErr) {
         console.warn('[Resend] Email delivery note:', mailErr.message);
       }
@@ -382,11 +385,14 @@ const server = http.createServer(async (req, res) => {
 
       let emailResult = null;
       try {
-        emailResult = await sendPasswordResetEmail({
-          to: cleanEmail,
-          name: user.name,
-          code,
-        });
+        emailResult = await Promise.race([
+          sendPasswordResetEmail({
+            to: cleanEmail,
+            name: user.name,
+            code,
+          }),
+          new Promise((resolve) => setTimeout(() => resolve({ timeout: true }), 3500)),
+        ]);
       } catch (err) {
         console.warn('[Password Reset] Email delivery note:', err.message);
       }
@@ -396,7 +402,7 @@ const server = http.createServer(async (req, res) => {
         email: cleanEmail,
         devCode: code,
         emailPreviewUrl: emailResult?.previewUrl || null,
-        realSent: Boolean(emailResult?.realSent),
+        realSent: Boolean(emailResult?.realSent || emailResult?.success),
         message: `A 6-digit password reset code was sent to ${cleanEmail}!`,
       });
     }

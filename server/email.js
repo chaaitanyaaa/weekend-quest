@@ -44,13 +44,18 @@ export async function getTransporter() {
         },
       });
     } else {
-      // Default to Gmail service
+      // Direct Gmail SMTP over secure SSL port 465 with fast connection timeouts for cloud environments
       cachedTransporter = nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
         auth: {
           user: smtpUser,
           pass: smtpPass,
         },
+        connectionTimeout: 6000,
+        greetingTimeout: 5000,
+        socketTimeout: 10000,
       });
     }
 
