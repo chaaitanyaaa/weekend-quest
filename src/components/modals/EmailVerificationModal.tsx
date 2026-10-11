@@ -3,7 +3,6 @@ import { Member } from '../../types';
 import { Modal } from './Modal';
 import { verifyEmailCode, resendVerificationCode, sendLoginOtp, verifyLoginOtp } from '../../utils/auth';
 import { ShieldCheck, Mail, ArrowRight, RotateCw, Sparkles, CheckCircle2 } from 'lucide-react';
-import confetti from 'canvas-confetti';
 
 interface EmailVerificationModalProps {
   open: boolean;
@@ -143,12 +142,6 @@ export function EmailVerificationModal({
       setLoading(false);
       return;
     }
-
-    confetti({
-      particleCount: 120,
-      spread: 80,
-      origin: { y: 0.6 },
-    });
 
     setLoading(false);
     onClose();

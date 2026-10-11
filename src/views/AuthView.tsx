@@ -18,7 +18,6 @@ import {
   Wand2,
   Trash2,
 } from 'lucide-react';
-import confetti from 'canvas-confetti';
 import {
   authenticateUser,
   registerNewUser,
@@ -207,12 +206,6 @@ export function AuthView({
       }
 
       if (res.user) {
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 },
-        });
-
         onRegister(res.user);
         onToast(`Account created! Welcome, ${res.user.name}!`);
       }
@@ -319,7 +312,6 @@ export function AuthView({
         return;
       }
 
-      confetti({ particleCount: 90, spread: 60, origin: { y: 0.6 } });
       setForgotOpen(false);
       setForgotStep(1);
       setLoginEmail(forgotEmail);
