@@ -67,9 +67,15 @@ export function App() {
     setStoredData('wq_dark_mode', darkMode);
   }, [darkMode]);
 
-  // Auth state
+  // Auth state - defaults to false so fresh visitors see Login / Registration page
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    return getStoredData<boolean>('wq_authenticated', true);
+    const authStored = getStoredData<boolean | null>('wq_authenticated', null);
+    const settings = getStoredData<UserSettings | null>('wq_user_settings', null);
+    // If not explicitly authenticated, or if session is the mock default 'alex@weekend.quest', show login page
+    if (!authStored || !settings || settings.email === 'alex@weekend.quest') {
+      return false;
+    }
+    return Boolean(authStored);
   });
 
   // User Settings state
@@ -367,6 +373,16 @@ export function App() {
   );
 
   const handleGuest = useCallback(() => {
+    const guestSettings: UserSettings = {
+      ...DEFAULT_USER_SETTINGS,
+      id: `u-guest-${Date.now()}`,
+      name: 'Guest Explorer',
+      email: 'guest@weekend.quest',
+      initials: 'GE',
+      color: '#FF6A5B',
+    };
+    setUserSettings(guestSettings);
+    setStoredData('wq_user_settings', guestSettings);
     setIsAuthenticated(true);
     setView('dashboard');
     showToast('Signed in as Guest Explorer');
@@ -374,6 +390,8 @@ export function App() {
 
   const handleSignOut = useCallback(() => {
     setIsAuthenticated(false);
+    setStoredData('wq_authenticated', false);
+    setStoredData('wq_user_settings', null);
     showToast('Signed out. See you next weekend!');
   }, [showToast]);
 
