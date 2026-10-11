@@ -41,7 +41,8 @@ import { Toast } from './components/Toast';
 import { joinGroupByCode } from './utils/auth';
 
 // Resolves a consistent user ID even across sessions or legacy local storage
-function resolveUserId(settings: UserSettings): string {
+function resolveUserId(settings?: UserSettings | null): string {
+  if (!settings) return 'u-alex';
   if (settings.id) return settings.id;
   const email = settings.email?.toLowerCase().trim();
   if (email === 'potato@gmail.com') return 'u-1791739134992';
@@ -84,17 +85,18 @@ export function App() {
 
   // User Settings state
   const [userSettings, setUserSettings] = useState<UserSettings>(() => {
-    return getStoredData<UserSettings>('wq_user_settings', DEFAULT_USER_SETTINGS);
+    return getStoredData<UserSettings>('wq_user_settings', DEFAULT_USER_SETTINGS) || DEFAULT_USER_SETTINGS;
   });
 
   const currentUser: Member = useMemo(() => {
-    const userId = resolveUserId(userSettings);
+    const current = userSettings || DEFAULT_USER_SETTINGS;
+    const userId = resolveUserId(current);
     return {
       id: userId,
-      name: userSettings.name,
-      initials: userSettings.initials || 'AR',
-      color: userSettings.color || '#FF6A5B',
-      email: userSettings.email,
+      name: current.name || 'Alex Rivera',
+      initials: current.initials || 'AR',
+      color: current.color || '#FF6A5B',
+      email: current.email || 'alex@weekend.quest',
     };
   }, [userSettings]);
 
@@ -109,10 +111,11 @@ export function App() {
   // Groups scoped specifically to current user account
   const [groups, setGroups] = useState<Group[]>(() => {
     const userId = resolveUserId(userSettings);
-    return getStoredData<Group[]>(
+    const stored = getStoredData<Group[]>(
       `wq_groups_${userId}`,
       userId === 'u-alex' ? GROUPS : []
     );
+    return Array.isArray(stored) ? stored : (userId === 'u-alex' ? GROUPS : []);
   });
 
   const [activeGroupId, setActiveGroupId] = useState<string>(() => {
@@ -121,16 +124,17 @@ export function App() {
       `wq_groups_${userId}`,
       userId === 'u-alex' ? GROUPS : []
     );
+    const safeGroups = Array.isArray(initialGroups) ? initialGroups : (userId === 'u-alex' ? GROUPS : []);
     return getStoredData<string>(
       `wq_active_group_id_${userId}`,
-      initialGroups[0]?.id || ''
+      safeGroups[0]?.id || GROUPS[0].id
     );
   });
 
-  const activeGroup = useMemo(
-    () => groups.find((g) => g.id === activeGroupId) || groups[0],
-    [groups, activeGroupId]
-  );
+  const activeGroup = useMemo(() => {
+    const safeGroups = Array.isArray(groups) && groups.length > 0 ? groups : GROUPS;
+    return safeGroups.find((g) => g && g.id === activeGroupId) || safeGroups[0] || GROUPS[0];
+  }, [groups, activeGroupId]);
 
   // Fetch groups scoped to current user from SQLite backend
   const fetchUserGroups = useCallback(async (userId: string) => {
@@ -173,12 +177,16 @@ export function App() {
 
   // Ideas per group
   const [ideas, setIdeas] = useState<Idea[]>(() => {
-    return activeGroupId ? getStoredData<Idea[]>(`wq_ideas_${activeGroupId}`, activeGroupId === 'g1' ? INITIAL_IDEAS : []) : [];
+    if (!activeGroupId) return INITIAL_IDEAS;
+    const stored = getStoredData<Idea[]>(`wq_ideas_${activeGroupId}`, activeGroupId === 'g1' ? INITIAL_IDEAS : []);
+    return Array.isArray(stored) ? stored : (activeGroupId === 'g1' ? INITIAL_IDEAS : []);
   });
 
   // Activity stream
   const [activity, setActivity] = useState<ActivityItem[]>(() => {
-    return activeGroupId ? getStoredData<ActivityItem[]>(`wq_activity_${activeGroupId}`, activeGroupId === 'g1' ? INITIAL_ACTIVITY : []) : [];
+    if (!activeGroupId) return INITIAL_ACTIVITY;
+    const stored = getStoredData<ActivityItem[]>(`wq_activity_${activeGroupId}`, activeGroupId === 'g1' ? INITIAL_ACTIVITY : []);
+    return Array.isArray(stored) ? stored : (activeGroupId === 'g1' ? INITIAL_ACTIVITY : []);
   });
 
   // Upcoming planned quest

@@ -160,7 +160,10 @@ export const INITIAL_EXPLORE: Idea[] = [
 export function getStoredData<T>(key: string, fallback: T): T {
   try {
     const item = localStorage.getItem(key);
-    return item ? JSON.parse(item) : fallback;
+    if (!item || item === 'null' || item === 'undefined') return fallback;
+    const parsed = JSON.parse(item);
+    if (parsed === null || parsed === undefined) return fallback;
+    return parsed;
   } catch (e) {
     console.warn(`Failed to read ${key} from localStorage:`, e);
     return fallback;
@@ -169,7 +172,11 @@ export function getStoredData<T>(key: string, fallback: T): T {
 
 export function setStoredData<T>(key: string, value: T): void {
   try {
-    localStorage.setItem(key, JSON.stringify(value));
+    if (value === null || value === undefined) {
+      localStorage.removeItem(key);
+    } else {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
   } catch (e) {
     console.warn(`Failed to write ${key} to localStorage:`, e);
   }

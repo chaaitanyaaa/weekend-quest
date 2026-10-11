@@ -30,6 +30,17 @@ export class ErrorBoundary extends Component<Props, State> {
     window.location.reload();
   };
 
+  public handleResetAndClear = () => {
+    try {
+      localStorage.clear();
+      sessionStorage.clear();
+    } catch (e) {
+      // ignore
+    }
+    this.setState({ hasError: false, error: null });
+    window.location.href = window.location.pathname;
+  };
+
   public render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
@@ -53,12 +64,20 @@ export class ErrorBoundary extends Component<Props, State> {
                 {this.state.error.message}
               </div>
             )}
-            <button
-              onClick={this.handleReset}
-              className="w-full h-12 rounded-xl bg-coral text-cream font-bold text-sm shadow-coral hover:bg-coral-dark inline-flex items-center justify-center gap-2 transition-all"
-            >
-              <RefreshCw className="w-4 h-4" /> Reload Weekend Quest
-            </button>
+            <div className="flex flex-col gap-2.5">
+              <button
+                onClick={this.handleReset}
+                className="w-full h-11 rounded-xl bg-coral text-cream font-bold text-xs shadow-coral hover:bg-coral-dark inline-flex items-center justify-center gap-2 transition-all"
+              >
+                <RefreshCw className="w-4 h-4" /> Reload Page
+              </button>
+              <button
+                onClick={this.handleResetAndClear}
+                className="w-full h-10 rounded-xl bg-cream-2 dark:bg-navy text-navy/70 dark:text-cream/70 hover:text-coral font-bold text-xs inline-flex items-center justify-center gap-2 transition-all"
+              >
+                Reset & Clean Session
+              </button>
+            </div>
           </div>
         </div>
       );
