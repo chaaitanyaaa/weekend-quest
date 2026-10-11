@@ -134,10 +134,23 @@ function getAppUrl(req) {
   if (process.env.APP_URL) return process.env.APP_URL.replace(/\/$/, '');
   const host = req.headers['x-forwarded-host'] || req.headers.host;
   const proto = req.headers['x-forwarded-proto'] || (host?.includes('localhost') ? 'http' : 'https');
-  return host ? `${proto}://${host}` : 'https://weekend-quest.onrender.com';
+  if (host) return `${proto}://${host}`;
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return 'http://localhost:3001';
 }
 
 function parseBody(req) {
+  if (req.body) {
+    if (typeof req.body === 'string') {
+      try {
+        return Promise.resolve(JSON.parse(req.body));
+      } catch {
+        return Promise.resolve({});
+      }
+    }
+    return Promise.resolve(req.body);
+  }
+
   return new Promise((resolve, reject) => {
     let body = '';
     req.on('data', (chunk) => (body += chunk));
@@ -151,7 +164,7 @@ function parseBody(req) {
   });
 }
 
-const server = http.createServer(async (req, res) => {
+export async function handleRequest(req, res) {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     res.writeHead(204, {
@@ -162,8 +175,19 @@ const server = http.createServer(async (req, res) => {
     return res.end();
   }
 
-  const url = new URL(req.url, `http://${req.headers.host}`);
-  const pathname = url.pathname;
+  const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost';
+  const url = new URL(req.url, `http://${host}`);
+  
+  // Resolve pathname supporting direct calls, Vercel rewrites, and headers
+  let pathname = url.pathname;
+  const matchedPath = req.headers['x-matched-path'];
+  const queryPath = url.searchParams.get('_path');
+
+  if (queryPath) {
+    pathname = queryPath;
+  } else if (matchedPath) {
+    pathname = matchedPath.split('?')[0];
+  }
 
   try {
     // 1. Health check
@@ -1131,8 +1155,14 @@ const server = http.createServer(async (req, res) => {
     console.error('[Server Error]', err);
     return jsonResponse(res, 500, { error: 'Internal Server Error', details: err.message });
   }
-});
+}
 
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`[Database Server] SQLite REST API & Web App running on port ${PORT}`);
-});
+const server = http.createServer(handleRequest);
+
+if (!process.env.VERCEL) {
+  server.listen(PORT, '0.0.0.0', () => {
+    console.log(`[Database Server] SQLite REST API & Web App running on port ${PORT}`);
+  });
+}
+
+export default handleRequest;

@@ -2,10 +2,33 @@ import { DatabaseSync } from 'node:sqlite';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import crypto from 'node:crypto';
+import fs from 'node:fs';
+import os from 'node:os';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const DB_PATH = process.env.DATABASE_PATH || join(__dirname, '..', 'database.sqlite');
+
+function resolveDbPath() {
+  if (process.env.DATABASE_PATH) return process.env.DATABASE_PATH;
+  if (process.env.VERCEL) {
+    const tmpDir = os.tmpdir() || '/tmp';
+    const tmpPath = join(tmpDir, 'database.sqlite');
+    const sourcePath = join(__dirname, '..', 'database.sqlite');
+    try {
+      fs.mkdirSync(tmpDir, { recursive: true });
+      if (!fs.existsSync(tmpPath) && fs.existsSync(sourcePath)) {
+        fs.copyFileSync(sourcePath, tmpPath);
+        console.log('[Database] Seeded initial database into temp directory from source.');
+      }
+    } catch (err) {
+      console.warn('[Database] Note: Could not copy initial database to temp directory:', err.message);
+    }
+    return tmpPath;
+  }
+  return join(__dirname, '..', 'database.sqlite');
+}
+
+const DB_PATH = resolveDbPath();
 
 export const db = new DatabaseSync(DB_PATH);
 
