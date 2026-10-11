@@ -128,6 +128,13 @@ function jsonResponse(res, statusCode, data) {
   res.end(JSON.stringify(data));
 }
 
+function getAppUrl(req) {
+  if (process.env.APP_URL) return process.env.APP_URL.replace(/\/$/, '');
+  const host = req.headers['x-forwarded-host'] || req.headers.host;
+  const proto = req.headers['x-forwarded-proto'] || (host?.includes('localhost') ? 'http' : 'https');
+  return host ? `${proto}://${host}` : 'https://weekend-quest.onrender.com';
+}
+
 function parseBody(req) {
   return new Promise((resolve, reject) => {
     let body = '';
@@ -655,7 +662,7 @@ const server = http.createServer(async (req, res) => {
             groupName: group.name,
             groupEmoji: group.emoji,
             joinCode,
-            appUrl: 'http://localhost:5173',
+            appUrl: getAppUrl(req),
           });
         } catch (e) {
           console.error('[Invite] Email error:', e.message);
@@ -688,7 +695,7 @@ const server = http.createServer(async (req, res) => {
             groupName: group.name,
             groupEmoji: group.emoji,
             joinCode,
-            appUrl: 'http://localhost:5173',
+            appUrl: getAppUrl(req),
           });
         } catch (e) {
           console.error('[Invite] Email error:', e.message);
@@ -881,7 +888,7 @@ const server = http.createServer(async (req, res) => {
               groupName: group?.name || 'Your Circle',
               eventTitle: quest.title,
               dateLine: quest.date_line,
-              appUrl: 'http://localhost:5173',
+              appUrl: getAppUrl(req),
             });
             sentCount++;
           } catch (e) {
