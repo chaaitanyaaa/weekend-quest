@@ -26,7 +26,7 @@ export function WinningBanner({ idea, onPlan }: WinningBannerProps) {
   return (
     <section
       aria-label="Top voted quest"
-      className="relative overflow-hidden rounded-3xl bg-lime dark:bg-lime-950/60 border border-lime-dark/30 p-6 sm:p-8 shadow-lime transition-all"
+      className="relative overflow-hidden rounded-2xl bg-lime dark:bg-lime-950/60 border border-lime-dark/30 p-6 sm:p-8 shadow-lime transition-all"
     >
       <div
         className="absolute -right-8 -top-8 w-40 h-40 rounded-full bg-lime-dark/20 dark:bg-lime/10 blur-2xl pointer-events-none"

@@ -109,10 +109,7 @@ export function SettingsView({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <section className="rounded-3xl bg-white dark:bg-navy-card border border-navy/5 dark:border-white/5 shadow-soft p-6 sm:p-8 transition-colors">
-        <p className="text-[11px] font-bold uppercase tracking-wider text-navy/40 dark:text-cream/40 mb-1">
-          Preferences
-        </p>
+      <section className="rounded-2xl bg-white dark:bg-navy-card border border-navy/5 dark:border-white/5 shadow-soft p-6 sm:p-8 transition-colors">
         <h1 className="font-display font-extrabold text-3xl sm:text-4xl leading-tight dark:text-cream">
           Settings
         </h1>
@@ -150,7 +147,7 @@ export function SettingsView({
 
       {/* Tab 1: Profile */}
       {activeTab === 'profile' && (
-        <section className="bg-white dark:bg-navy-card rounded-3xl border border-navy/5 dark:border-white/5 shadow-soft p-6 sm:p-8 space-y-6 transition-colors">
+        <section className="bg-white dark:bg-navy-card rounded-2xl border border-navy/5 dark:border-white/5 shadow-soft p-6 sm:p-8 space-y-6 transition-colors">
           <div className="flex items-center gap-4 pb-6 border-b border-navy/10 dark:border-white/10">
             <Avatar
               member={{
@@ -250,7 +247,7 @@ export function SettingsView({
 
       {/* Tab 2: Appearance */}
       {activeTab === 'appearance' && (
-        <section className="bg-white dark:bg-navy-card rounded-3xl border border-navy/5 dark:border-white/5 shadow-soft p-6 sm:p-8 space-y-6 transition-colors">
+        <section className="bg-white dark:bg-navy-card rounded-2xl border border-navy/5 dark:border-white/5 shadow-soft p-6 sm:p-8 space-y-6 transition-colors">
           <div>
             <h3 className="font-display font-bold text-lg dark:text-cream mb-1">Theme Mode</h3>
             <p className="text-xs text-navy/55 dark:text-cream/55 mb-4">
@@ -317,7 +314,7 @@ export function SettingsView({
 
       {/* Tab 3: Notifications */}
       {activeTab === 'notifications' && (
-        <section className="bg-white dark:bg-navy-card rounded-3xl border border-navy/5 dark:border-white/5 shadow-soft p-6 sm:p-8 space-y-5 transition-colors">
+        <section className="bg-white dark:bg-navy-card rounded-2xl border border-navy/5 dark:border-white/5 shadow-soft p-6 sm:p-8 space-y-5 transition-colors">
           <div>
             <h3 className="font-display font-bold text-lg dark:text-cream mb-1">
               Weekend Notifications
@@ -376,7 +373,7 @@ export function SettingsView({
 
       {/* Tab 4: Data & Backup */}
       {activeTab === 'data' && (
-        <section className="bg-white dark:bg-navy-card rounded-3xl border border-navy/5 dark:border-white/5 shadow-soft p-6 sm:p-8 space-y-6 transition-colors">
+        <section className="bg-white dark:bg-navy-card rounded-2xl border border-navy/5 dark:border-white/5 shadow-soft p-6 sm:p-8 space-y-6 transition-colors">
           <div>
             <h3 className="font-display font-bold text-lg dark:text-cream mb-1">Data Backup & Sync</h3>
             <p className="text-xs text-navy/55 dark:text-cream/55 mb-4">

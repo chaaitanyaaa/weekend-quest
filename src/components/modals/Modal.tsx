@@ -49,7 +49,7 @@ export function Modal({ open, onClose, title, subtitle, children, footer }: Moda
       />
       <div
         ref={ref}
-        className="relative bg-cream dark:bg-navy-card w-full max-w-md sm:max-w-lg rounded-3xl shadow-lifted modal-content max-h-[90dvh] flex flex-col border border-navy/10 dark:border-white/10 my-auto"
+        className="relative bg-cream dark:bg-navy-card w-full max-w-md sm:max-w-lg rounded-2xl shadow-lifted modal-content max-h-[90dvh] flex flex-col border border-navy/10 dark:border-white/10 my-auto"
       >
         <header className="flex items-start justify-between p-5 sm:p-6 border-b border-navy/10 dark:border-white/10">
           <div>

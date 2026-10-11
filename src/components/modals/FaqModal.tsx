@@ -77,7 +77,7 @@ export function FaqModal({ open, onClose, onToast }: FaqModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/60 backdrop-blur-sm animate-fade-in">
       <div
-        className="relative w-full max-w-xl max-h-[90vh] flex flex-col rounded-3xl bg-white dark:bg-navy-card border border-navy/10 dark:border-white/10 shadow-2xl overflow-hidden"
+        className="relative w-full max-w-xl max-h-[90vh] flex flex-col rounded-2xl bg-white dark:bg-navy-card border border-navy/10 dark:border-white/10 shadow-2xl overflow-hidden"
         role="dialog"
         aria-labelledby="faq-title"
       >

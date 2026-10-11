@@ -105,13 +105,9 @@ export function GroupsView({
 
   return (
     <div className="space-y-6">
-      <section className="rounded-3xl bg-white dark:bg-navy-card border border-navy/5 dark:border-white/5 shadow-soft p-6 sm:p-8 transition-colors">
+      <section className="rounded-2xl bg-white dark:bg-navy-card border border-navy/5 dark:border-white/5 shadow-soft p-6 sm:p-8 transition-colors">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
-            <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-navy/40 dark:text-cream/40 mb-1">
-              <Shield className="w-3.5 h-3.5 text-lime-dark" />
-              <span>Private Circles</span>
-            </div>
             <h1 className="font-display font-extrabold text-3xl sm:text-4xl leading-tight dark:text-cream">
               Your groups
             </h1>
@@ -137,7 +133,7 @@ export function GroupsView({
       </section>
 
       {groups.length === 0 ? (
-        <div className="bg-white dark:bg-navy-card rounded-3xl border border-dashed border-coral/30 p-12 text-center shadow-soft">
+        <div className="bg-white dark:bg-navy-card rounded-2xl border border-dashed border-coral/30 p-12 text-center shadow-soft">
           <div className="w-16 h-16 rounded-2xl bg-coral/10 text-coral text-3xl grid place-items-center mx-auto mb-4">
             🌟
           </div>
@@ -160,7 +156,7 @@ export function GroupsView({
             return (
               <article
                 key={g.id}
-                className={`bg-white dark:bg-navy-card rounded-3xl border p-5 sm:p-6 shadow-soft transition-all ${
+                className={`bg-white dark:bg-navy-card rounded-2xl border p-5 sm:p-6 shadow-soft transition-all ${
                   active
                     ? 'border-coral/40 ring-2 ring-coral/20'
                     : 'border-navy/5 dark:border-white/5 hover:shadow-lifted'
@@ -243,7 +239,7 @@ export function GroupsView({
 
           <button
             onClick={() => setCreateModalOpen(true)}
-            className="bg-cream-2/50 dark:bg-navy/30 border-2 border-dashed border-navy/15 dark:border-white/15 rounded-3xl p-6 flex flex-col items-center justify-center text-center min-h-[160px] hover:border-coral/40 hover:bg-cream-2 dark:hover:bg-navy/50 transition-all group"
+            className="bg-cream-2/50 dark:bg-navy/30 border-2 border-dashed border-navy/15 dark:border-white/15 rounded-2xl p-6 flex flex-col items-center justify-center text-center min-h-[160px] hover:border-coral/40 hover:bg-cream-2 dark:hover:bg-navy/50 transition-all group"
           >
             <div className="w-12 h-12 rounded-2xl bg-white dark:bg-navy-card grid place-items-center mb-3 group-hover:scale-110 transition-transform shadow-soft">
               <Plus className="w-5 h-5 text-coral" />

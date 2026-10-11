@@ -39,10 +39,7 @@ export function ExploreView({ ideas, onSave, onAdoptToGroup }: ExploreViewProps)
 
   return (
     <div className="space-y-6">
-      <section className="rounded-3xl bg-white dark:bg-navy-card border border-navy/5 dark:border-white/5 shadow-soft p-6 sm:p-8 transition-colors">
-        <p className="text-[11px] font-bold uppercase tracking-wider text-navy/40 dark:text-cream/40 mb-1">
-          Discover
-        </p>
+      <section className="rounded-2xl bg-white dark:bg-navy-card border border-navy/5 dark:border-white/5 shadow-soft p-6 sm:p-8 transition-colors">
         <h1 className="font-display font-extrabold text-3xl sm:text-4xl leading-tight dark:text-cream">
           Explore quests
         </h1>
@@ -100,7 +97,7 @@ export function ExploreView({ ideas, onSave, onAdoptToGroup }: ExploreViewProps)
 
       {/* Grid */}
       {filtered.length === 0 ? (
-        <div className="bg-white dark:bg-navy-card rounded-3xl border border-dashed border-navy/15 dark:border-white/15 p-10 text-center">
+        <div className="bg-white dark:bg-navy-card rounded-2xl border border-dashed border-navy/15 dark:border-white/15 p-10 text-center">
           <div className="w-14 h-14 rounded-2xl bg-cream-2 dark:bg-navy grid place-items-center mx-auto mb-4">
             <Search className="w-6 h-6 text-navy/40 dark:text-cream/40" />
           </div>
@@ -126,7 +123,7 @@ export function ExploreView({ ideas, onSave, onAdoptToGroup }: ExploreViewProps)
             return (
               <article
                 key={idea.id}
-                className="bg-white dark:bg-navy-card rounded-3xl p-5 border border-navy/5 dark:border-white/5 shadow-soft hover:shadow-lifted hover:-translate-y-1 transition-all duration-300 flex flex-col"
+                className="bg-white dark:bg-navy-card rounded-2xl p-5 border border-navy/5 dark:border-white/5 shadow-soft hover:shadow-lifted hover:-translate-y-0.5 transition-all duration-200 ease-out flex flex-col"
               >
                 <div className="flex items-center justify-between mb-3">
                   <span

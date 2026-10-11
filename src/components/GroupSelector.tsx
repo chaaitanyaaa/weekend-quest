@@ -39,7 +39,7 @@ export function GroupSelector({
 
   if (!group) {
     return (
-      <div className="p-6 sm:p-8 bg-white dark:bg-navy-card rounded-3xl border border-dashed border-coral/30 shadow-soft text-center">
+      <div className="p-6 sm:p-8 bg-white dark:bg-navy-card rounded-2xl border border-dashed border-coral/30 shadow-soft text-center">
         <div className="w-12 h-12 rounded-2xl bg-coral/10 text-coral grid place-items-center mx-auto mb-3 text-2xl">
           🌟
         </div>
@@ -61,7 +61,7 @@ export function GroupSelector({
 
   return (
     <div className="relative" ref={ref}>
-      <div className="w-full flex items-center gap-3 sm:gap-4 p-4 sm:p-5 bg-white dark:bg-navy-card rounded-3xl border border-navy/10 dark:border-white/10 shadow-soft hover:shadow-lifted transition-all text-left">
+      <div className="w-full flex items-center gap-3 sm:gap-4 p-4 sm:p-5 bg-white dark:bg-navy-card rounded-2xl border border-navy/10 dark:border-white/10 shadow-soft hover:shadow-lifted transition-all text-left">
         <button
           onClick={() => setOpen(!open)}
           aria-expanded={open}

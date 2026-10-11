@@ -10,7 +10,7 @@ export function ActivityFeed({ items }: ActivityFeedProps) {
   return (
     <section
       aria-label="Recent activity"
-      className="bg-white dark:bg-navy-card rounded-3xl border border-navy/10 dark:border-white/10 shadow-soft p-5 sm:p-6 transition-colors"
+      className="bg-white dark:bg-navy-card rounded-2xl border border-navy/10 dark:border-white/10 shadow-soft p-5 sm:p-6 transition-colors"
     >
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-display font-bold text-lg dark:text-cream">Activity</h3>

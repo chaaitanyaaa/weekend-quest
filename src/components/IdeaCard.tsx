@@ -15,7 +15,7 @@ export function IdeaCard({ idea, onVote, onPlan, onOpenDetails }: IdeaCardProps)
   const commentsCount = idea.comments?.length || 0;
 
   return (
-    <article className="group bg-white dark:bg-navy-card rounded-3xl p-5 border border-navy/5 dark:border-white/5 shadow-soft hover:shadow-lifted hover:-translate-y-1 transition-all duration-300 flex flex-col">
+    <article className="group bg-white dark:bg-navy-card rounded-2xl p-5 border border-navy/5 dark:border-white/5 shadow-soft hover:shadow-lifted hover:-translate-y-0.5 transition-all duration-200 ease-out flex flex-col">
       <div className="flex items-center justify-between mb-3">
         <span
           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${meta.bg} ${meta.text}`}

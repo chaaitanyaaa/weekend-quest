@@ -72,7 +72,7 @@ export function DashboardView({
   return (
     <div className="space-y-8">
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-3xl bg-white dark:bg-navy-card border border-navy/5 dark:border-white/5 shadow-soft p-6 sm:p-10 transition-colors">
+      <section className="relative overflow-hidden rounded-2xl bg-white dark:bg-navy-card border border-navy/5 dark:border-white/5 shadow-soft p-6 sm:p-10 transition-colors">
         <div
           className="absolute -right-12 -top-12 w-56 h-56 rounded-full bg-coral/15 blur-3xl pointer-events-none"
           aria-hidden="true"
@@ -109,9 +109,6 @@ export function DashboardView({
       <section aria-label="Idea board">
         <div className="flex items-end justify-between mb-4 gap-3">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-wider text-navy/40 dark:text-cream/40 mb-1">
-              The idea board
-            </p>
             <h2 className="font-display font-extrabold text-2xl sm:text-3xl leading-tight dark:text-cream">
               What should we do?
             </h2>
@@ -197,7 +194,7 @@ export function DashboardView({
         )}
 
         {ideas.length === 0 ? (
-          <div className="bg-white dark:bg-navy-card rounded-3xl border border-dashed border-navy/15 dark:border-white/15 p-10 text-center">
+          <div className="bg-white dark:bg-navy-card rounded-2xl border border-dashed border-navy/15 dark:border-white/15 p-10 text-center">
             <div className="w-14 h-14 rounded-2xl bg-cream-2 dark:bg-navy grid place-items-center mx-auto mb-4">
               <Lightbulb className="w-6 h-6 text-navy/40 dark:text-cream/40" />
             </div>
@@ -213,7 +210,7 @@ export function DashboardView({
             </button>
           </div>
         ) : filteredIdeas.length === 0 ? (
-          <div className="bg-white dark:bg-navy-card rounded-3xl border border-dashed border-navy/15 dark:border-white/15 p-8 text-center">
+          <div className="bg-white dark:bg-navy-card rounded-2xl border border-dashed border-navy/15 dark:border-white/15 p-8 text-center">
             <h3 className="font-display font-bold text-base mb-1 dark:text-cream">No matching ideas found</h3>
             <p className="text-xs text-navy/55 dark:text-cream/55 mb-3">
               No ideas matched your search criteria.

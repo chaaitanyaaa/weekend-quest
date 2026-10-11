@@ -130,7 +130,7 @@ export function UpcomingQuestCard({
     return (
       <section
         aria-label="Upcoming quest"
-        className="bg-white dark:bg-navy-card rounded-3xl border border-dashed border-navy/15 dark:border-white/15 p-6 sm:p-8 text-center transition-colors shadow-soft"
+        className="bg-white dark:bg-navy-card rounded-2xl border border-dashed border-navy/15 dark:border-white/15 p-6 sm:p-8 text-center transition-colors shadow-soft"
       >
         <div className="w-12 h-12 rounded-2xl bg-cream-2 dark:bg-navy text-2xl grid place-items-center mx-auto mb-3">
           🎯
@@ -146,7 +146,7 @@ export function UpcomingQuestCard({
   return (
     <section
       aria-label="Upcoming quest"
-      className="bg-white dark:bg-navy-card rounded-3xl border border-navy/10 dark:border-white/10 shadow-soft overflow-hidden transition-colors"
+      className="bg-white dark:bg-navy-card rounded-2xl border border-navy/10 dark:border-white/10 shadow-soft overflow-hidden transition-colors"
     >
       <div className="p-5 sm:p-6">
         {/* Header line */}

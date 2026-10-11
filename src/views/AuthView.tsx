@@ -409,7 +409,7 @@ export function AuthView({
 
         {/* Right column: Auth Card */}
         <div className="lg:col-span-6">
-          <div className="bg-white dark:bg-navy-card rounded-3xl border border-navy/10 dark:border-white/10 shadow-lifted p-6 sm:p-9 transition-colors relative overflow-hidden">
+          <div className="bg-white dark:bg-navy-card rounded-2xl border border-navy/10 dark:border-white/10 shadow-lifted p-6 sm:p-9 transition-colors relative overflow-hidden">
             {/* Header Tabs */}
             <div className="flex p-1 bg-cream-2 dark:bg-navy rounded-2xl mb-6">
               <button
@@ -844,7 +844,7 @@ export function AuthView({
             className="fixed inset-0 bg-navy/50 backdrop-blur-sm"
             onClick={() => setForgotOpen(false)}
           />
-          <div className="relative bg-white dark:bg-navy-card w-full max-w-md rounded-3xl shadow-lifted p-6 border border-navy/10 dark:border-white/10 z-10 slide-in-right my-auto">
+          <div className="relative bg-white dark:bg-navy-card w-full max-w-md rounded-2xl shadow-lifted p-6 border border-navy/10 dark:border-white/10 z-10 slide-in-right my-auto">
             <div className="flex items-center gap-2.5 mb-2">
               <div className="w-9 h-9 rounded-xl bg-coral/10 text-coral grid place-items-center">
                 <KeyRound className="w-5 h-5" />
