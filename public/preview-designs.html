@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weekend Quest — Design Concepts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;600;700;800&family=Bricolage+Grotesque:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0f172a;
+      color: #f1f5f9;
+      font-family: 'Albert Sans', -apple-system, sans-serif;
+      padding: 32px 20px 80px;
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    header {
+      margin-bottom: 40px;
+      text-align: center;
+    }
+    h1 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.02em;
+    }
+    h1 span { color: #ff6a5b; }
+    p.lead {
+      color: #94a3b8;
+      font-size: 1.1rem;
+      margin-top: 10px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .grid {
+      display: flex;
+      flex-direction: column;
+      gap: 48px;
+    }
+    .concept-card {
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.4);
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .concept-card:hover {
+      border-color: rgba(255, 106, 91, 0.4);
+    }
+    .img-wrap {
+      width: 100%;
+      background: #000;
+      overflow: hidden;
+      cursor: zoom-in;
+    }
+    .img-wrap img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.3s;
+    }
+    .concept-body {
+      padding: 24px 28px;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      margin-bottom: 12px;
+    }
+    .badge-a { background: rgba(255, 106, 91, 0.15); color: #ff6a5b; }
+    .badge-b { background: rgba(198, 232, 76, 0.15); color: #c6e84c; }
+    .badge-c { background: rgba(123, 207, 184, 0.15); color: #7bcfb8; }
+    h2 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+    .desc {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      margin-bottom: 18px;
+    }
+    .features {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 16px;
+    }
+    .features li {
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .features li::before {
+      content: "✓";
+      color: #ff6a5b;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Weekend Quest <span>UI Direction</span></h1>
+      <p class="lead">Three bespoke design concepts to break out of the generic AI template and build an authentic, memorable product.</p>
+    </header>
+
+    <div class="grid">
+      <!-- Option A -->
+      <article class="concept-card">
+        <div class="img-wrap">
+          <img src="/mockups/concept-a.jpg" alt="Option A: Tactile Ticket Board" />
+        </div>
+        <div class="concept-body">
+          <span class="badge badge-a">Option A · Partiful / Nightclub Pass</span>
+          <h2>The Tactile Ticket Board</h2>
+          <p class="desc">High contrast dark-slate ground with tangible cream ticket-stub cards. Directly schedules 72 hours across Friday, Saturday, and Sunday columns with perforated slips, venue chips, and an integrated group voting & chat rail.</p>
+          <ul class="features">
+            <li>Friday / Saturday / Sunday Columns</li>
+            <li>Physical Perforated Ticket Stubs</li>
+            <li>Live Group Polls & Chat Sidecar</li>
+            <li>Tear-off notch & venue chips</li>
+          </ul>
+        </div>
+      </article>
+
+      <!-- Option B -->
+      <article class="concept-card">
+        <div class="img-wrap">
+          <img src="/mockups/concept-b.jpg" alt="Option B: Editorial Magazine Guide" />
+        </div>
+        <div class="concept-body">
+          <span class="badge badge-b">Option B · Monocle / Kinfolk</span>
+          <h2>The Editorial Weekend Guide</h2>
+          <p class="desc">Clean warm daylight mode, editorial magazine typography, and structured graphic columns. Reads like a sophisticated weekend broadsheet with time-stamped activity blocks and RSVP avatar clusters.</p>
+          <ul class="features">
+            <li>Warm daylight paper aesthetic</li>
+            <li>Specific time slots (10 AM, 7 PM)</li>
+            <li>Illustrated category art banners</li>
+            <li>Zero blurry background halos</li>
+          </ul>
+        </div>
+      </article>
+
+      <!-- Option C -->
+      <article class="concept-card">
+        <div class="img-wrap">
+          <img src="/mockups/concept-c.jpg" alt="Option C: Dub.co & Amie Precision Dashboard" />
+        </div>
+        <div class="concept-body">
+          <span class="badge badge-c">Option C · Dub.co & Linear</span>
+          <h2>The Dub.co & Amie Precision Dashboard</h2>
+          <p class="desc">Minimalist dark-slate dashboard with 1px subtle borders, prominent Thursday Lock countdown timer, live vote progress meters (8 / 5 votes needed to win), and real-time circle presence feed.</p>
+          <ul class="features">
+            <li>Thursday Lock Countdown header</li>
+            <li>Vote progress milestone bars</li>
+            <li>Active circle member presence rail</li>
+            <li>Quiet chrome & crisp 1px borders</li>
+          </ul>
+        </div>
+      </article>
+    </div>
+  </div>
+</body>
+</html>

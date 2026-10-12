@@ -17,6 +17,9 @@ import {
   Smartphone,
   Wand2,
   Trash2,
+  Ticket,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import {
   authenticateUser,
@@ -54,6 +57,24 @@ const AVATAR_COLORS = [
   '#EC4899', // Pink
 ];
 
+function PaperClip() {
+  return (
+    <div className="absolute -top-3.5 right-3.5 z-10 pointer-events-none select-none">
+      <svg
+        viewBox="0 0 16 36"
+        className="w-3.5 h-7 drop-shadow-sm text-[#78716C] dark:text-[#A8A29E]"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M5 9 V28 C5 31 11 31 11 28 V6 C11 2 2 2 2 6 V24 C2 27 8 27 8 24 V9" />
+      </svg>
+    </div>
+  );
+}
+
 export function AuthView({
   onLogin,
   onRegister,
@@ -65,6 +86,7 @@ export function AuthView({
   const [mode, setMode] = useState<'signin' | 'register'>('signin');
   const [signInMethod, setSignInMethod] = useState<'password' | 'otp'>('password');
   const [loading, setLoading] = useState(false);
+  const [devToolsOpen, setDevToolsOpen] = useState(false);
 
   // Sign In form fields
   const [loginEmail, setLoginEmail] = useState('alex@weekend.quest');
@@ -325,7 +347,7 @@ export function AuthView({
   };
 
   return (
-    <div className="min-h-screen bg-cream dark:bg-navy-dark text-navy dark:text-cream flex flex-col justify-center py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
+    <div className="min-h-screen bg-cream dark:bg-navy-dark text-navy dark:text-cream flex flex-col justify-center py-10 px-4 sm:px-6 lg:px-8 transition-colors duration-200 bg-dots relative overflow-hidden">
       {/* Top right theme toggle */}
       <div className="absolute top-6 right-6 z-20 flex items-center gap-3">
         <button
@@ -337,9 +359,10 @@ export function AuthView({
         </button>
       </div>
 
-      <div className="max-w-5xl w-full mx-auto grid lg:grid-cols-12 gap-8 items-center">
-        {/* Left column: Brand storytelling & visual preview */}
-        <div className="lg:col-span-6 space-y-6 lg:pr-8">
+      <div className="max-w-5xl w-full mx-auto grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+        {/* Left column: Brand storytelling & tactile itinerary slips */}
+        <div className="lg:col-span-6 space-y-6 lg:pr-4">
+          {/* Brand Mark Header */}
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-2xl bg-coral grid place-items-center shadow-coral">
               <Sun className="w-6 h-6 text-cream" />
@@ -354,487 +377,526 @@ export function AuthView({
             </div>
           </div>
 
-          <div className="space-y-3">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-lime/40 dark:bg-lime-900/40 text-xs font-bold text-navy dark:text-lime">
-              <Sparkles className="w-3.5 h-3.5 text-lime-dark" />
-              Real authentication with password verification
-            </span>
-            <h1 className="font-display font-extrabold text-4xl sm:text-5xl leading-[1.1] tracking-tight dark:text-cream">
-              Weekends are too short for <span className="text-coral">lost plans.</span>
+          <div>
+            <h1 className="font-display font-black text-4xl sm:text-5xl lg:text-[3.1rem] leading-[1.05] tracking-tight text-navy dark:text-cream uppercase">
+              WEEKENDS ARE TOO SHORT FOR{' '}
+              <span className="line-through decoration-coral decoration-4 text-navy/35 dark:text-cream/35">
+                GROUP CHATS
+              </span>
+              <span className="text-coral block">LOST PLANS.</span>
             </h1>
-            <p className="text-base sm:text-lg text-navy/70 dark:text-cream/70 leading-relaxed">
-              No more endless group chat debates. Pitch ideas, vote on the best adventures, divide
-              expenses, and lock in the fun before Friday night.
-            </p>
           </div>
 
-          {/* Social Proof Cards */}
-          <div className="space-y-3 pt-2">
-            <div className="p-4 rounded-2xl bg-white dark:bg-navy-card border border-navy/5 dark:border-white/5 shadow-soft flex items-center gap-4">
-              <div className="w-11 h-11 rounded-xl bg-coral/10 grid place-items-center text-2xl">
-                🍕
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-display font-bold text-sm dark:text-cream">
-                  Pizza & movie marathon
-                </p>
-                <p className="text-xs text-navy/50 dark:text-cream/50">Fri · 7:30 PM · 4 going</p>
-              </div>
-              <span className="text-xs font-bold text-coral px-2.5 py-1 rounded-full bg-coral/10">
-                Confirmed
-              </span>
+          {/* Editorial Hook & 3 Pinned Paper Calendar Cards */}
+          <div className="space-y-3 pt-1">
+            <div className="text-base sm:text-lg font-bold text-navy/80 dark:text-cream/80 tracking-tight">
+              Start your next quest now.
             </div>
 
-            <div className="p-4 rounded-2xl bg-white dark:bg-navy-card border border-navy/5 dark:border-white/5 shadow-soft flex items-center gap-4">
-              <div className="w-11 h-11 rounded-xl bg-lime/30 grid place-items-center text-2xl">
-                🥾
+            <div className="grid grid-cols-3 gap-2 sm:gap-3.5 pt-1 items-start">
+              {/* Card 1: Friday */}
+              <div className="relative bg-[#FCFBF8] text-[#111827] rounded-xl p-2.5 sm:p-3.5 border border-[#DFD3B9] shadow-md -rotate-1 hover:rotate-0 hover:shadow-lg transition-all duration-200 select-none flex flex-col justify-between min-h-[195px] sm:min-h-[210px]">
+                <PaperClip />
+                <div>
+                  <div className="flex items-start justify-between pb-1.5">
+                    <div>
+                      <div className="font-display font-black text-base sm:text-xl tracking-tight leading-none uppercase text-[#111827]">
+                        FRIDAY
+                      </div>
+                      <div className="text-[10px] sm:text-[11px] font-mono font-bold text-[#111827]/70 mt-0.5">
+                        Mar 15
+                      </div>
+                    </div>
+                    <div className="w-5 sm:w-6 h-6 sm:h-7 rounded border border-[#111827]/30 bg-white flex flex-col items-center overflow-hidden shrink-0 shadow-xs">
+                      <div className="w-full h-1.5 sm:h-2 bg-[#111827]" />
+                      <span className="text-[8px] sm:text-[10px] font-mono font-black text-[#111827] leading-none mt-0.5">15</span>
+                    </div>
+                  </div>
+
+                  <div className="py-2 border-t border-[#111827]/10 text-[10px] sm:text-xs font-semibold text-[#111827] leading-snug">
+                    <span className="font-black">7 PM</span>
+                    <span className="text-[#111827]/30 mx-1 font-normal">|</span>
+                    <span>Rooftop Drinks @ The Perch</span>
+                  </div>
+                </div>
+
+                {/* Hand-drawn sketches */}
+                <div className="pt-2 border-t border-[#111827]/10 flex items-center justify-between text-[#111827]/60">
+                  <svg viewBox="0 0 28 20" className="w-6 sm:w-7 h-4.5 sm:h-5 stroke-current fill-none stroke-[1.6] stroke-linecap-round stroke-linejoin-round">
+                    <polygon points="2,4 10,2 18,4 26,2 26,17 18,19 10,17 2,19" />
+                    <line x1="10" y1="2" x2="10" y2="17" />
+                    <line x1="18" y1="4" x2="18" y2="19" />
+                    <circle cx="14" cy="10" r="1.8" />
+                  </svg>
+                  <svg viewBox="0 0 22 14" className="w-4.5 sm:w-5 h-3 sm:h-3.5 stroke-current fill-none stroke-[1.5] stroke-linecap-round">
+                    <path d="M2 10 Q7 2 12 8 T20 4" />
+                  </svg>
+                  <svg viewBox="0 0 18 18" className="w-4 sm:w-4.5 h-4 sm:h-4.5 stroke-current fill-none stroke-[1.5] stroke-linecap-round">
+                    <line x1="3" y1="7" x2="15" y2="7" />
+                    <line x1="9" y1="7" x2="9" y2="15" />
+                    <line x1="5" y1="15" x2="13" y2="15" />
+                    <path d="M6 3 L12 3 L9 7 Z" />
+                  </svg>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-display font-bold text-sm dark:text-cream">
-                  Sunset hike at Eagle Ridge
-                </p>
-                <p className="text-xs text-navy/50 dark:text-cream/50">Sat · 5:00 PM · 6 votes</p>
+
+              {/* Card 2: Saturday (Warm aged kraft paper) */}
+              <div className="relative bg-[#F2E5C9] text-[#1B1811] rounded-xl p-2.5 sm:p-3.5 border border-[#D9C49E] shadow-md rotate-0.5 hover:scale-[1.02] hover:shadow-lg transition-all duration-200 select-none flex flex-col justify-between min-h-[195px] sm:min-h-[210px]">
+                <PaperClip />
+                <div>
+                  <div className="flex items-start justify-between pb-1.5">
+                    <div>
+                      <div className="font-display font-black text-base sm:text-xl tracking-tight leading-none uppercase text-[#1B1811]">
+                        SATURDAY
+                      </div>
+                      <div className="text-[10px] sm:text-[11px] font-mono font-bold text-[#1B1811]/70 mt-0.5">
+                        Mar 16
+                      </div>
+                    </div>
+                    <div className="w-5 sm:w-6 h-6 sm:h-7 rounded border border-[#1B1811]/30 bg-[#FFFBF0] flex flex-col items-center overflow-hidden shrink-0 shadow-xs">
+                      <div className="w-full h-1.5 sm:h-2 bg-[#1B1811]" />
+                      <span className="text-[8px] sm:text-[10px] font-mono font-black text-[#1B1811] leading-none mt-0.5">16</span>
+                    </div>
+                  </div>
+
+                  <div className="py-2 border-t border-[#1B1811]/15 text-[10px] sm:text-xs font-semibold text-[#1B1811] space-y-1 leading-snug">
+                    <div>
+                      <span className="font-black">10 AM</span>
+                      <span className="text-[#1B1811]/30 mx-1 font-normal">|</span>
+                      <span>Forest Hike @ Fern Creek Trail</span>
+                    </div>
+                    <div>
+                      <span className="font-black">6 PM</span>
+                      <span className="text-[#1B1811]/30 mx-1 font-normal">|</span>
+                      <span>Dinner @ Campfire Grill</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Hand-drawn sketches */}
+                <div className="pt-2 border-t border-[#1B1811]/15 flex items-center justify-between text-[#1B1811]/75">
+                  <svg viewBox="0 0 26 18" className="w-5.5 sm:w-6 h-4 sm:h-4.5 stroke-current fill-none stroke-[1.5] stroke-linejoin-round">
+                    <polygon points="7,16 3,16 6,10 4,10 7,5 10,10 8,10 11,16 7,16" />
+                    <polygon points="17,16 13,16 16,11 14,11 17,6 20,11 18,11 21,16 17,16" />
+                  </svg>
+                  <svg viewBox="0 0 18 15" className="w-4 sm:w-4.5 h-3 sm:h-3.5 stroke-current fill-none stroke-[1.5] stroke-linecap-round">
+                    <path d="M2 3 H16 V10 H7 L4 13 V10 H2 Z" />
+                  </svg>
+                  <svg viewBox="0 0 18 18" className="w-4 sm:w-4.5 h-4 sm:h-4.5 stroke-current fill-none stroke-[1.5] stroke-linecap-round">
+                    <line x1="3" y1="15" x2="15" y2="15" />
+                    <line x1="4" y1="16" x2="14" y2="12" />
+                    <line x1="14" y1="16" x2="4" y2="12" />
+                    <path d="M9 3 C7 6 5 8 6 11 C7 13 11 13 12 11 C13 8 10 6 9 3 Z" />
+                  </svg>
+                </div>
               </div>
-              <span className="text-xs font-bold text-teal px-2.5 py-1 rounded-full bg-teal/10">
-                Top Voted
-              </span>
+
+              {/* Card 3: Sunday */}
+              <div className="relative bg-[#FCFBF8] text-[#111827] rounded-xl p-2.5 sm:p-3.5 border border-[#DFD3B9] shadow-md rotate-1 hover:rotate-0 hover:shadow-lg transition-all duration-200 select-none flex flex-col justify-between min-h-[195px] sm:min-h-[210px]">
+                <PaperClip />
+                <div>
+                  <div className="flex items-start justify-between pb-1.5">
+                    <div>
+                      <div className="font-display font-black text-base sm:text-xl tracking-tight leading-none uppercase text-[#111827]">
+                        SUNDAY
+                      </div>
+                      <div className="text-[10px] sm:text-[11px] font-mono font-bold text-[#111827]/70 mt-0.5">
+                        Mar 17
+                      </div>
+                    </div>
+                    <div className="w-5 sm:w-6 h-6 sm:h-7 rounded border border-[#111827]/30 bg-white flex flex-col items-center overflow-hidden shrink-0 shadow-xs">
+                      <div className="w-full h-1.5 sm:h-2 bg-[#111827]" />
+                      <span className="text-[8px] sm:text-[10px] font-mono font-black text-[#111827] leading-none mt-0.5">17</span>
+                    </div>
+                  </div>
+
+                  <div className="py-2 border-t border-[#111827]/10 text-[10px] sm:text-xs font-semibold text-[#111827] leading-snug">
+                    <span className="font-black">11 AM</span>
+                    <span className="text-[#111827]/30 mx-1 font-normal">|</span>
+                    <span>Brunch & Vinyl @ The Needle & Groove</span>
+                  </div>
+                </div>
+
+                {/* Hand-drawn sketches */}
+                <div className="pt-2 border-t border-[#111827]/10 flex items-center justify-between text-[#111827]/65">
+                  <svg viewBox="0 0 20 20" className="w-4.5 sm:w-5 h-4.5 sm:h-5 stroke-current fill-none stroke-[1.5]">
+                    <circle cx="10" cy="10" r="8" />
+                    <circle cx="10" cy="10" r="4.5" strokeDasharray="1.5 1.5" />
+                    <circle cx="10" cy="10" r="1.8" fill="currentColor" />
+                    <line x1="14" y1="3" x2="11.5" y2="8" strokeLinecap="round" />
+                  </svg>
+                  <svg viewBox="0 0 16 16" className="w-3.5 sm:w-4 h-3.5 sm:h-4 stroke-current fill-none stroke-[1.5] stroke-linecap-round stroke-linejoin-round">
+                    <path d="M8 13.5 C8 13.5 1.5 9.5 1.5 5.5 C1.5 3.5 3 2 5 2 C6.2 2 7.2 2.7 8 3.5 C8.8 2.7 9.8 2 11 2 C13 2 14.5 3.5 14.5 5.5 C14.5 9.5 8 13.5 8 13.5 Z" />
+                  </svg>
+                  <svg viewBox="0 0 18 18" className="w-4 sm:w-4.5 h-4 sm:h-4.5 stroke-current fill-none stroke-[1.5]">
+                    <rect x="3" y="2.5" width="12" height="13" rx="2" />
+                    <circle cx="9" cy="10.5" r="2.8" />
+                    <circle cx="9" cy="5.5" r="1" fill="currentColor" />
+                  </svg>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 text-xs font-semibold text-navy/50 dark:text-cream/50 pt-2">
-            <ShieldCheck className="w-4 h-4 text-teal" />
-            <span>SHA-256 password hashing • Verified local registry</span>
+          {/* Security badge footer */}
+          <div className="flex items-center gap-2 text-xs font-mono text-navy/60 dark:text-cream/60 pt-1">
+            <ShieldCheck className="w-4 h-4 text-teal shrink-0" />
+            <span>END-TO-END SECURE VAULT · SHA-256 HASHED · OTP READY</span>
           </div>
         </div>
 
-        {/* Right column: Auth Card */}
-        <div className="lg:col-span-6">
-          <div className="bg-white dark:bg-navy-card rounded-2xl border border-navy/10 dark:border-white/10 shadow-lifted p-6 sm:p-9 transition-colors relative overflow-hidden">
-            {/* Header Tabs */}
-            <div className="flex p-1 bg-cream-2 dark:bg-navy rounded-2xl mb-6">
-              <button
-                type="button"
-                onClick={() => {
-                  setMode('signin');
-                  setErrors({});
-                  setAuthError('');
-                }}
-                className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all ${
-                  mode === 'signin'
-                    ? 'bg-white dark:bg-navy-card text-navy dark:text-cream shadow-sm'
-                    : 'text-navy/60 dark:text-cream/60 hover:text-navy dark:hover:text-cream'
-                }`}
-              >
-                Sign In
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setMode('register');
-                  setErrors({});
-                  setAuthError('');
-                }}
-                className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all ${
-                  mode === 'register'
-                    ? 'bg-white dark:bg-navy-card text-navy dark:text-cream shadow-sm'
-                    : 'text-navy/60 dark:text-cream/60 hover:text-navy dark:hover:text-cream'
-                }`}
-              >
-                Create Account
-              </button>
+        {/* Right column: Tactile VIP Event Pass Auth Card (Faithful to Mockup, Zero Clutter) */}
+        <div className="lg:col-span-6 flex justify-center">
+          <div className="w-full max-w-md relative bg-[#FAF4E6] text-[#111827] rounded-3xl border border-[#DFD3B9] shadow-lifted overflow-hidden flex">
+            {/* Left Vertical Punch-Hole Binder Strip */}
+            <div className="w-8 sm:w-10 bg-[#F4EBD6] border-r-2 border-dashed border-[#DFD3B9] flex flex-col justify-around items-center py-6 shrink-0 select-none">
+              <div className="w-3.5 h-3.5 rounded-full bg-cream dark:bg-navy-dark border border-[#DFD3B9] shadow-inner" />
+              <div className="w-3.5 h-3.5 rounded-full bg-cream dark:bg-navy-dark border border-[#DFD3B9] shadow-inner" />
+              <div className="w-3.5 h-3.5 rounded-full bg-cream dark:bg-navy-dark border border-[#DFD3B9] shadow-inner" />
+              <div className="w-3.5 h-3.5 rounded-full bg-cream dark:bg-navy-dark border border-[#DFD3B9] shadow-inner" />
+              <div className="w-3.5 h-3.5 rounded-full bg-cream dark:bg-navy-dark border border-[#DFD3B9] shadow-inner" />
+              <div className="w-3.5 h-3.5 rounded-full bg-cream dark:bg-navy-dark border border-[#DFD3B9] shadow-inner" />
             </div>
 
-            {/* Global Authentication Error Alert */}
-            {authError && (
-              <div className="mb-4 p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 flex items-start gap-2.5 text-xs text-rose-800 dark:text-rose-200">
-                <AlertCircle className="w-4 h-4 shrink-0 text-coral mt-0.5" />
-                <div className="flex-1 font-semibold leading-relaxed">{authError}</div>
-              </div>
-            )}
-
-            {/* Mode 1: Sign In */}
-            {mode === 'signin' && (
-              <div className="space-y-4">
-                {/* Method selector: Password vs 6-Digit OTP */}
-                <div className="flex p-1 bg-cream-2/80 dark:bg-navy/80 rounded-xl text-xs font-bold border border-navy/5 dark:border-white/5">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSignInMethod('password');
-                      setAuthError('');
-                      setErrors({});
-                    }}
-                    className={`flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-                      signInMethod === 'password'
-                        ? 'bg-white dark:bg-navy-card text-navy dark:text-cream shadow-xs font-extrabold'
-                        : 'text-navy/60 dark:text-cream/60 hover:text-navy dark:hover:text-cream'
-                    }`}
-                  >
-                    <Lock className="w-3.5 h-3.5" />
-                    <span>Password Sign In</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSignInMethod('otp');
-                      setAuthError('');
-                      setErrors({});
-                    }}
-                    className={`flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-                      signInMethod === 'otp'
-                        ? 'bg-white dark:bg-navy-card text-coral dark:text-coral shadow-xs font-extrabold'
-                        : 'text-navy/60 dark:text-cream/60 hover:text-coral'
-                    }`}
-                  >
-                    <Smartphone className="w-3.5 h-3.5 text-coral" />
-                    <span>6-Digit OTP Sign In</span>
-                  </button>
-                </div>
-
-                {signInMethod === 'otp' ? (
-                  /* OTP Login Form */
-                  <form onSubmit={handleOtpLoginSubmit} className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-bold mb-1.5 dark:text-cream">
-                        Email Address
-                      </label>
-                      <div className="relative">
-                        <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-navy/40 dark:text-cream/40" />
-                        <input
-                          type="email"
-                          value={loginEmail}
-                          onChange={(e) => {
-                            setLoginEmail(e.target.value);
-                            setAuthError('');
-                          }}
-                          placeholder="alex@weekend.quest"
-                          className="w-full pl-10 pr-4 h-12 rounded-xl bg-cream-2 dark:bg-navy border border-transparent focus:border-coral focus:bg-white text-sm dark:text-cream focus:outline-none transition-all"
-                        />
-                      </div>
-                      {errors.email && (
-                        <p className="text-xs text-coral-dark font-semibold mt-1">{errors.email}</p>
-                      )}
-                    </div>
-
-                    <div className="p-3.5 rounded-2xl bg-coral/5 dark:bg-coral/10 border border-coral/20 text-xs text-navy/80 dark:text-cream/80 flex items-start gap-2.5">
-                      <Sparkles className="w-4 h-4 text-coral shrink-0 mt-0.5" />
-                      <div className="leading-relaxed">
-                        We'll send a <strong>6-digit security code</strong> directly to your email. Enter it on the next screen to sign in instantly without typing a password!
-                      </div>
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="w-full h-12 rounded-2xl bg-coral text-cream font-bold text-sm shadow-coral hover:bg-coral-dark active:scale-95 transition-all flex items-center justify-center gap-2 mt-2 disabled:opacity-60"
-                    >
-                      {loading ? (
-                        <span className="inline-block animate-spin mr-2">⏳</span>
-                      ) : (
-                        <>
-                          <Smartphone className="w-4 h-4" />
-                          <span>Send 6-Digit OTP Code</span>
-                          <ArrowRight className="w-4 h-4" />
-                        </>
-                      )}
-                    </button>
-                  </form>
-                ) : (
-                  /* Password Login Form */
-                  <form onSubmit={handleSignInSubmit} className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-bold mb-1.5 dark:text-cream">Email Address</label>
-                      <div className="relative">
-                        <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-navy/40 dark:text-cream/40" />
-                        <input
-                          type="email"
-                          value={loginEmail}
-                          onChange={(e) => {
-                            setLoginEmail(e.target.value);
-                            setAuthError('');
-                          }}
-                          placeholder="alex@weekend.quest"
-                          className="w-full pl-10 pr-4 h-12 rounded-xl bg-cream-2 dark:bg-navy border border-transparent focus:border-coral focus:bg-white text-sm dark:text-cream focus:outline-none transition-all"
-                        />
-                      </div>
-                      {errors.email && (
-                        <p className="text-xs text-coral-dark font-semibold mt-1">{errors.email}</p>
-                      )}
-                    </div>
-
-                    <div>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <label className="text-sm font-bold dark:text-cream">Password</label>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setForgotEmail(loginEmail);
-                            setForgotOpen(true);
-                            setForgotError('');
-                          }}
-                          className="text-xs font-semibold text-coral hover:underline"
-                        >
-                          Forgot password?
-                        </button>
-                      </div>
-                      <div className="relative">
-                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-navy/40 dark:text-cream/40" />
-                        <input
-                          type={showLoginPassword ? 'text' : 'password'}
-                          value={loginPassword}
-                          onChange={(e) => {
-                            setLoginPassword(e.target.value);
-                            setAuthError('');
-                          }}
-                          placeholder="••••••••"
-                          className="w-full pl-10 pr-11 h-12 rounded-xl bg-cream-2 dark:bg-navy border border-transparent focus:border-coral focus:bg-white text-sm dark:text-cream focus:outline-none transition-all"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowLoginPassword(!showLoginPassword)}
-                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-navy/40 dark:text-cream/40 hover:text-navy"
-                        >
-                          {showLoginPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                        </button>
-                      </div>
-                      {errors.password && (
-                        <p className="text-xs text-coral-dark font-semibold mt-1">{errors.password}</p>
-                      )}
-                      <div className="flex items-center justify-between text-[11px] text-navy/50 dark:text-cream/50 mt-1">
-                        <span>
-                          Default demo: <code className="font-mono font-bold text-coral">password123</code>
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => setSignInMethod('otp')}
-                          className="text-coral hover:underline font-bold"
-                        >
-                          Use OTP code instead →
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-1">
-                      <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-navy/70 dark:text-cream/70">
-                        <input
-                          type="checkbox"
-                          checked={rememberMe}
-                          onChange={(e) => setRememberMe(e.target.checked)}
-                          className="w-4 h-4 accent-coral rounded"
-                        />
-                        Remember me on this device
-                      </label>
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="w-full h-12 rounded-2xl bg-coral text-cream font-bold text-sm shadow-coral hover:bg-coral-dark active:scale-95 transition-all flex items-center justify-center gap-2 mt-2 disabled:opacity-60"
-                    >
-                      {loading ? (
-                        <span className="inline-block animate-spin mr-2">⏳</span>
-                      ) : (
-                        <>
-                          <span>Sign In with Password</span>
-                          <ArrowRight className="w-4 h-4" />
-                        </>
-                      )}
-                    </button>
-                  </form>
-                )}
-
-                {/* 1-Click Quick Demo Accounts with pre-verified credentials */}
-                <div className="pt-4 border-t border-navy/10 dark:border-white/10 space-y-2">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-navy/40 dark:text-cream/40 text-center">
-                    Instant Demo Login (Valid Credentials)
-                  </p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleQuickDemo('alex@weekend.quest')}
-                      className="px-3 py-2 rounded-xl bg-cream-2/70 dark:bg-navy/70 hover:bg-cream-3 dark:hover:bg-navy text-xs font-bold text-navy dark:text-cream transition-colors flex items-center justify-center gap-1.5"
-                    >
-                      <span className="w-2 h-2 rounded-full bg-coral"></span>
-                      Alex Rivera
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleQuickDemo('maya@weekend.quest')}
-                      className="px-3 py-2 rounded-xl bg-cream-2/70 dark:bg-navy/70 hover:bg-cream-3 dark:hover:bg-navy text-xs font-bold text-navy dark:text-cream transition-colors flex items-center justify-center gap-1.5"
-                    >
-                      <span className="w-2 h-2 rounded-full bg-lime"></span>
-                      Maya Chen
-                    </button>
+            {/* Ticket Content Container */}
+            <div className="flex-1 p-6 sm:p-7 flex flex-col justify-between relative">
+              {/* Top Ticket Header */}
+              <div>
+                <div className="flex items-start justify-between pb-2.5 border-b border-[#DFD3B9]">
+                  <div>
+                    <span className="font-display font-black text-xl tracking-tight text-[#111827] block leading-none">
+                      WEEKEND
+                    </span>
+                    <span className="font-display font-black text-xl tracking-tight text-coral block leading-none">
+                      QUEST
+                    </span>
                   </div>
+                  <div className="text-right">
+                    <span className="text-[11px] font-mono font-black tracking-wider text-[#111827] block uppercase">
+                      VIP EVENT PASS
+                    </span>
+                    <span className="text-[10px] font-mono text-[#111827]/60 block font-semibold">
+                      NO. 2026-001
+                    </span>
+                  </div>
+                </div>
+                <div className="text-[10px] font-mono font-extrabold uppercase tracking-wider text-[#111827]/70 pt-2 pb-4">
+                  ADMIT ONE: CREATIVE ADVENTURE
                 </div>
               </div>
-            )}
 
-            {/* Mode 2: Register */}
-            {mode === 'register' && (
-              <form onSubmit={handleRegisterSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-bold mb-1.5 dark:text-cream">Full Name</label>
-                  <div className="relative">
-                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-navy/40 dark:text-cream/40" />
-                    <input
-                      type="text"
-                      value={regName}
-                      onChange={(e) => setRegName(e.target.value)}
-                      placeholder="e.g. Jordan Smith"
-                      className="w-full pl-10 pr-4 h-12 rounded-xl bg-cream-2 dark:bg-navy border border-transparent focus:border-coral focus:bg-white text-sm dark:text-cream focus:outline-none transition-all"
-                    />
-                  </div>
-                  {errors.name && (
-                    <p className="text-xs text-coral-dark font-semibold mt-1">{errors.name}</p>
-                  )}
+              {/* Global Authentication Error Alert */}
+              {authError && (
+                <div className="mb-3 p-3 rounded-xl bg-rose-50 border border-rose-300 flex items-start gap-2 text-xs text-rose-800">
+                  <AlertCircle className="w-4 h-4 shrink-0 text-coral mt-0.5" />
+                  <div className="flex-1 font-semibold leading-relaxed">{authError}</div>
                 </div>
+              )}
 
-                <div>
-                  <label className="block text-sm font-bold mb-1.5 dark:text-cream">Email Address</label>
-                  <div className="relative">
-                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-navy/40 dark:text-cream/40" />
-                    <input
-                      type="email"
-                      value={regEmail}
-                      onChange={(e) => setRegEmail(e.target.value)}
-                      placeholder="jordan@example.com"
-                      className="w-full pl-10 pr-4 h-12 rounded-xl bg-cream-2 dark:bg-navy border border-transparent focus:border-coral focus:bg-white text-sm dark:text-cream focus:outline-none transition-all"
-                    />
-                  </div>
-                  {errors.email && (
-                    <p className="text-xs text-coral-dark font-semibold mt-1">{errors.email}</p>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
+              {/* Mode: Sign In Form */}
+              {mode === 'signin' ? (
+                <form onSubmit={handleSignInSubmit} className="space-y-3.5">
                   <div>
-                    <label className="block text-sm font-bold mb-1.5 dark:text-cream">Password</label>
-                    <input
-                      type={showRegPassword ? 'text' : 'password'}
-                      value={regPassword}
-                      onChange={(e) => setRegPassword(e.target.value)}
-                      placeholder="min 6 chars"
-                      className="w-full px-3 h-12 rounded-xl bg-cream-2 dark:bg-navy border border-transparent focus:border-coral focus:bg-white text-sm dark:text-cream focus:outline-none transition-all"
-                    />
+                    <label className="block text-[10px] font-mono font-extrabold uppercase tracking-wider mb-1 text-[#111827]/80">
+                      EMAIL
+                    </label>
+                    <div className="relative">
+                      <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50" />
+                      <input
+                        type="email"
+                        value={loginEmail}
+                        onChange={(e) => {
+                          setLoginEmail(e.target.value);
+                          setAuthError('');
+                        }}
+                        placeholder="your.name@email.com"
+                        className="w-full pl-10 pr-4 h-11 rounded-xl bg-[#232936] text-white border border-black/10 focus:ring-2 focus:ring-coral/40 text-sm focus:outline-none transition-all placeholder-white/35 font-medium"
+                      />
+                    </div>
+                    {errors.email && (
+                      <p className="text-xs text-coral-dark font-semibold mt-1">{errors.email}</p>
+                    )}
                   </div>
-                  <div>
-                    <label className="block text-sm font-bold mb-1.5 dark:text-cream">Confirm</label>
-                    <input
-                      type={showRegPassword ? 'text' : 'password'}
-                      value={regConfirmPassword}
-                      onChange={(e) => setRegConfirmPassword(e.target.value)}
-                      placeholder="repeat"
-                      className="w-full px-3 h-12 rounded-xl bg-cream-2 dark:bg-navy border border-transparent focus:border-coral focus:bg-white text-sm dark:text-cream focus:outline-none transition-all"
-                    />
-                  </div>
-                </div>
-                {errors.password && (
-                  <p className="text-xs text-coral-dark font-semibold">{errors.password}</p>
-                )}
-                {errors.confirmPassword && (
-                  <p className="text-xs text-coral-dark font-semibold">{errors.confirmPassword}</p>
-                )}
 
-                {/* Avatar Color Choice */}
-                <div>
-                  <label className="block text-xs font-bold mb-1.5 uppercase tracking-wider text-navy/50 dark:text-cream/50">
-                    Your Crew Avatar Color
-                  </label>
-                  <div className="flex gap-2">
-                    {AVATAR_COLORS.map((c) => (
+                  <div>
+                    <label className="block text-[10px] font-mono font-extrabold uppercase tracking-wider mb-1 text-[#111827]/80">
+                      PASSWORD
+                    </label>
+                    <div className="relative">
+                      <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50" />
+                      <input
+                        type={showLoginPassword ? 'text' : 'password'}
+                        value={loginPassword}
+                        onChange={(e) => {
+                          setLoginPassword(e.target.value);
+                          setAuthError('');
+                        }}
+                        placeholder="Enter your password"
+                        className="w-full pl-10 pr-11 h-11 rounded-xl bg-[#232936] text-white border border-black/10 focus:ring-2 focus:ring-coral/40 text-sm focus:outline-none transition-all placeholder-white/35 font-medium"
+                      />
                       <button
-                        key={c}
                         type="button"
-                        onClick={() => setRegColor(c)}
-                        className="w-8 h-8 rounded-full grid place-items-center transition-transform hover:scale-110 shadow-sm"
-                        style={{ backgroundColor: c }}
+                        onClick={() => setShowLoginPassword(!showLoginPassword)}
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/50 hover:text-white"
                       >
-                        {regColor === c && <Check className="w-4 h-4 text-white stroke-[3]" />}
+                        {showLoginPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
-                    ))}
+                    </div>
+                    {errors.password && (
+                      <p className="text-xs text-coral-dark font-semibold mt-1">{errors.password}</p>
+                    )}
+                    <div className="flex justify-end mt-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setForgotEmail(loginEmail);
+                          setForgotOpen(true);
+                          setForgotError('');
+                        }}
+                        className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#111827]/70 hover:text-coral transition-colors"
+                      >
+                        FORGOT PASSWORD?
+                      </button>
+                    </div>
                   </div>
+
+                  {/* Stamped Ticket Button */}
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full h-11 rounded-xl bg-[#1A1F2C] hover:bg-black active:scale-[0.98] text-white font-mono font-black text-xs uppercase tracking-widest shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-60"
+                  >
+                    {loading ? 'CHECKING PASS...' : 'LOGIN TO YOUR QUEST'}
+                  </button>
+
+                  {/* Mode switch */}
+                  <div className="text-center text-[11px] font-mono text-[#111827]/70 pt-1">
+                    DON'T HAVE AN ACCOUNT?{' '}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMode('register');
+                        setAuthError('');
+                        setErrors({});
+                      }}
+                      className="font-extrabold text-[#111827] underline hover:text-coral transition-colors"
+                    >
+                      SIGN UP
+                    </button>
+                  </div>
+
+                  {/* Quick crew demo access */}
+                  <div className="pt-2 border-t border-[#DFD3B9] flex items-center justify-between text-[10px] font-mono text-[#111827]/60">
+                    <span className="font-bold">CREW DEMO:</span>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handleQuickDemo('alex@weekend.quest')}
+                        className="px-2 py-0.5 rounded bg-black/5 hover:bg-black/10 font-bold text-[#111827] transition-colors"
+                      >
+                        Alex (Lead)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleQuickDemo('maya@weekend.quest')}
+                        className="px-2 py-0.5 rounded bg-black/5 hover:bg-black/10 font-bold text-[#111827] transition-colors"
+                      >
+                        Maya (Trail)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={onGuest}
+                        className="px-2 py-0.5 rounded bg-black/5 hover:bg-black/10 font-bold text-[#111827] transition-colors"
+                      >
+                        Guest
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              ) : (
+                /* Mode: Sign Up / Register Form */
+                <form onSubmit={handleRegisterSubmit} className="space-y-3">
+                  <div>
+                    <label className="block text-[10px] font-mono font-extrabold uppercase tracking-wider mb-1 text-[#111827]/80">
+                      FULL NAME
+                    </label>
+                    <div className="relative">
+                      <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50" />
+                      <input
+                        type="text"
+                        value={regName}
+                        onChange={(e) => setRegName(e.target.value)}
+                        placeholder="e.g. Jordan Smith"
+                        className="w-full pl-10 pr-4 h-11 rounded-xl bg-[#232936] text-white border border-black/10 focus:ring-2 focus:ring-coral/40 text-sm focus:outline-none transition-all placeholder-white/35 font-medium"
+                      />
+                    </div>
+                    {errors.name && (
+                      <p className="text-xs text-coral-dark font-semibold mt-1">{errors.name}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-mono font-extrabold uppercase tracking-wider mb-1 text-[#111827]/80">
+                      EMAIL ADDRESS
+                    </label>
+                    <div className="relative">
+                      <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50" />
+                      <input
+                        type="email"
+                        value={regEmail}
+                        onChange={(e) => setRegEmail(e.target.value)}
+                        placeholder="jordan@example.com"
+                        className="w-full pl-10 pr-4 h-11 rounded-xl bg-[#232936] text-white border border-black/10 focus:ring-2 focus:ring-coral/40 text-sm focus:outline-none transition-all placeholder-white/35 font-medium"
+                      />
+                    </div>
+                    {errors.email && (
+                      <p className="text-xs text-coral-dark font-semibold mt-1">{errors.email}</p>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-mono font-extrabold uppercase tracking-wider mb-1 text-[#111827]/80">
+                        PASSWORD
+                      </label>
+                      <input
+                        type={showRegPassword ? 'text' : 'password'}
+                        value={regPassword}
+                        onChange={(e) => setRegPassword(e.target.value)}
+                        placeholder="min 6 chars"
+                        className="w-full px-3 h-11 rounded-xl bg-[#232936] text-white border border-black/10 focus:ring-2 focus:ring-coral/40 text-sm focus:outline-none transition-all placeholder-white/35 font-medium"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-mono font-extrabold uppercase tracking-wider mb-1 text-[#111827]/80">
+                        CONFIRM
+                      </label>
+                      <input
+                        type={showRegPassword ? 'text' : 'password'}
+                        value={regConfirmPassword}
+                        onChange={(e) => setRegConfirmPassword(e.target.value)}
+                        placeholder="repeat"
+                        className="w-full px-3 h-11 rounded-xl bg-[#232936] text-white border border-black/10 focus:ring-2 focus:ring-coral/40 text-sm focus:outline-none transition-all placeholder-white/35 font-medium"
+                      />
+                    </div>
+                  </div>
+                  {errors.password && (
+                    <p className="text-xs text-coral-dark font-semibold">{errors.password}</p>
+                  )}
+                  {errors.confirmPassword && (
+                    <p className="text-xs text-coral-dark font-semibold">{errors.confirmPassword}</p>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full h-11 rounded-xl bg-[#1A1F2C] hover:bg-black active:scale-[0.98] text-white font-mono font-black text-xs uppercase tracking-widest shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-60 mt-1"
+                  >
+                    {loading ? 'ISSUING PASS...' : 'CLAIM YOUR QUEST PASS'}
+                  </button>
+
+                  <div className="text-center text-[11px] font-mono text-[#111827]/70 pt-1">
+                    ALREADY HAVE A PASS?{' '}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMode('signin');
+                        setAuthError('');
+                        setErrors({});
+                      }}
+                      className="font-extrabold text-[#111827] underline hover:text-coral transition-colors"
+                    >
+                      SIGN IN
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* Bottom Perforated Section (Tear-Off Stub) */}
+              <div className="relative pt-4 mt-4 border-t-2 border-dashed border-[#DFD3B9] flex items-center justify-between">
+                {/* Semicircular notches at the perforation line */}
+                <div className="absolute -left-[30px] sm:-left-[35px] -top-2.5 w-5 h-5 rounded-full bg-cream dark:bg-navy-dark border border-[#DFD3B9] z-10" />
+                <div className="absolute -right-[29px] sm:-right-[33px] -top-2.5 w-5 h-5 rounded-full bg-cream dark:bg-navy-dark border border-[#DFD3B9] z-10" />
+
+                <div>
+                  <span className="font-display font-black text-base tracking-tight text-[#111827] uppercase block leading-tight">
+                    QUEST PASS
+                  </span>
+                  <span className="text-[9px] font-mono font-extrabold tracking-wider text-[#111827]/60 uppercase block">
+                    STAMPED | ADVENTURE AWAITS
+                  </span>
+                  <span className="text-[9px] font-mono text-[#111827]/50 block font-semibold">
+                    TICKET ID: WQ-V24
+                  </span>
                 </div>
 
-                {/* Weekend Pledge */}
-                <label className="flex items-start gap-2.5 cursor-pointer text-xs leading-snug text-navy/70 dark:text-cream/70 pt-1">
-                  <input
-                    type="checkbox"
-                    checked={agreedPledge}
-                    onChange={(e) => setAgreedPledge(e.target.checked)}
-                    className="w-4 h-4 accent-coral rounded mt-0.5"
-                  />
-                  <span>
-                    I take the <strong>Weekend Pledge</strong>: to suggest fun ideas, vote by Thursday,
-                    and never bail without bringing snacks.
-                  </span>
-                </label>
-                {errors.pledge && (
-                  <p className="text-xs text-coral-dark font-semibold">{errors.pledge}</p>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full h-12 rounded-2xl bg-coral text-cream font-bold text-sm shadow-coral hover:bg-coral-dark active:scale-95 transition-all flex items-center justify-center gap-2 mt-2 disabled:opacity-60"
-                >
-                  <Sparkles className="w-4 h-4" />
-                  <span>Register & Secure Password</span>
-                </button>
-              </form>
-            )}
-
-            {/* Developer / Testing Sandbox Tools */}
-            <div className="mt-5 pt-4 border-t border-navy/10 dark:border-white/10">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[11px] font-extrabold uppercase tracking-wider text-navy/50 dark:text-cream/50 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-coral" />
-                  Testing Sandbox Helpers
-                </span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-coral/10 text-coral font-bold">
-                  Unlimited Accounts
-                </span>
+                {/* Barcode Graphic & Emojis */}
+                <div className="text-right">
+                  <div className="flex items-center justify-end gap-[2px] h-6 text-[#111827]">
+                    <div className="w-[2px] h-full bg-current" />
+                    <div className="w-[1px] h-full bg-current" />
+                    <div className="w-[3px] h-full bg-current" />
+                    <div className="w-[1px] h-full bg-current" />
+                    <div className="w-[4px] h-full bg-current" />
+                    <div className="w-[2px] h-full bg-current" />
+                    <div className="w-[1px] h-full bg-current" />
+                    <div className="w-[3px] h-full bg-current" />
+                    <div className="w-[2px] h-full bg-current" />
+                    <div className="w-[4px] h-full bg-current" />
+                    <div className="w-[1px] h-full bg-current" />
+                    <div className="w-[2px] h-full bg-current" />
+                  </div>
+                  <div className="flex items-center justify-end gap-2 text-[9px] font-mono text-[#111827]/60 mt-0.5">
+                    <span>9 781234 567890 &gt;</span>
+                    <span className="tracking-widest">🧭 🗺️ 🤍</span>
+                  </div>
+                </div>
               </div>
-
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <button
-                  type="button"
-                  onClick={handleGenerateFreshEmail}
-                  className="p-2.5 rounded-xl bg-cream-2/80 dark:bg-navy/80 hover:bg-cream-3 dark:hover:bg-navy text-navy dark:text-cream font-bold transition-all flex items-center justify-center gap-1.5 border border-navy/5 dark:border-white/5 active:scale-95"
-                  title="Generate a fresh unique email address"
-                >
-                  <Wand2 className="w-3.5 h-3.5 text-coral" />
-                  <span>🎲 Fresh Email</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleClearCurrentAccount}
-                  className="p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/30 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-rose-700 dark:text-rose-300 font-bold transition-all flex items-center justify-center gap-1.5 border border-rose-200/50 dark:border-rose-800/30 active:scale-95"
-                  title="Clear the current email from the database so you can re-register"
-                >
-                  <Trash2 className="w-3.5 h-3.5 text-rose-500" />
-                  <span>🗑️ Reset Email</span>
-                </button>
-              </div>
-
-              <p className="text-[10px] text-navy/40 dark:text-cream/40 text-center mt-2 leading-relaxed">
-                Tip: You can also use <strong>youremail+1@gmail.com</strong>, <strong>+2</strong>, etc. to test unlimited accounts into your real Gmail inbox!
-              </p>
-            </div>
-
-            {/* Bottom Guest Action */}
-            <div className="mt-4 pt-3 text-center border-t border-navy/5 dark:border-white/5">
-              <button
-                type="button"
-                onClick={onGuest}
-                className="text-xs font-bold text-navy/60 dark:text-cream/60 hover:text-coral transition-colors"
-              >
-                Skip sign-in & explore demo as Guest →
-              </button>
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Floating Developer Sandbox Tool (Keeps ticket pristine) */}
+      <div className="fixed bottom-3 right-3 z-30">
+        {devToolsOpen ? (
+          <div className="p-3 rounded-2xl bg-white dark:bg-navy-card border border-navy/10 dark:border-white/10 shadow-lifted space-y-2 text-xs slide-in-right max-w-xs">
+            <div className="flex items-center justify-between">
+              <span className="font-mono font-bold text-[11px] text-navy dark:text-cream">🛠️ Test Sandbox</span>
+              <button
+                type="button"
+                onClick={() => setDevToolsOpen(false)}
+                className="text-navy/40 dark:text-cream/40 hover:text-navy text-xs"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-1.5">
+              <button
+                type="button"
+                onClick={handleGenerateFreshEmail}
+                className="p-1.5 rounded-lg bg-cream-2 dark:bg-navy text-[11px] font-mono font-bold text-navy dark:text-cream"
+              >
+                🎲 Fresh Email
+              </button>
+              <button
+                type="button"
+                onClick={handleClearCurrentAccount}
+                className="p-1.5 rounded-lg bg-rose-100 dark:bg-rose-950/40 text-[11px] font-mono font-bold text-rose-700 dark:text-rose-300"
+              >
+                🗑️ Reset Email
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setDevToolsOpen(true)}
+            className="px-2.5 py-1 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/15 text-[10px] font-mono text-navy/50 dark:text-cream/50 transition-colors"
+          >
+            🛠️ Dev Tools
+          </button>
+        )}
       </div>
 
       {/* Forgot Password Reset Modal */}
